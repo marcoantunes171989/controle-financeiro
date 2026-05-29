@@ -16,8 +16,8 @@ Sistema de controle financeiro multi-empresa com lançamentos, contas a pagar/re
 
 ## Repositórios e Serviços
 - **GitHub:** https://github.com/marcoantunes171989/controle-financeiro (branch `master`)
-- **Vercel:** Conectado ao GitHub — deploy automático a cada push para `master`
-- **Supabase:** Credenciais em `.env` (não commitado — ver `.env.example`)
+- **Vercel:** https://controle-financeiro-iota-kohl.vercel.app — deploy automático a cada push para `master`
+- **Supabase:** Projeto `luuqslqqncjsvekjkpnd` — credenciais em `.env` (não commitado)
 
 ## Variáveis de Ambiente
 Criar `.env` na raiz com:
