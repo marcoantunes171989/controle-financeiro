@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"C:/Projetos/controle-financeiro\" && git add -A && if ! git diff --cached --quiet; then MSG=\"auto: $(date '+%Y-%m-%d %H:%M')\"; git commit -m \"$MSG\" && git push origin master && echo \"[deploy-log] push enviado para master\"; fi || true",
+            "shell": "bash",
+            "timeout": 60,
+            "statusMessage": "Sincronizando com GitHub e Vercel..."
+          }
+        ]
+      }
+    ]
+  }
+}
