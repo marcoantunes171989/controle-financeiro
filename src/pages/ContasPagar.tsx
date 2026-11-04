@@ -32,6 +32,10 @@ export default function ContasPagar() {
   const [statusFiltro, setStatusFiltro] = useState("");
   const [catFiltro, setCatFiltro] = useState("");
   const [todosPeriodos, setTodosPeriodos] = useState(false);
+  const [empresaFiltro, setEmpresaFiltro] = useState("");
+  const [campoData, setCampoData] = useState<"vencimento" | "emissao">("vencimento");
+  const [dataInicio, setDataInicio] = useState("");
+  const [dataFim, setDataFim] = useState("");
 
   const [detalhe, setDetalhe] = useState<Lancamento | null>(null);
   const [anexosLanc, setAnexosLanc] = useState<Lancamento | null>(null);
@@ -43,9 +47,25 @@ export default function ContasPagar() {
 
   const q = busca.trim().toLowerCase();
 
+  // Intervalo de datas (emissão ou vencimento): quando preenchido, substitui o filtro de mês/ano da barra superior.
+  const intervaloInvalido = !!dataInicio && !!dataFim && dataFim < dataInicio;
+  const intervaloAtivo = (!!dataInicio || !!dataFim) && !intervaloInvalido;
+  const noIntervalo = (l: Lancamento) => {
+    const d = (campoData === "emissao" ? l.dataEmissao : l.dataVencimento).substring(0, 10);
+    if (dataInicio && d < dataInicio) return false;
+    if (dataFim && d > dataFim) return false;
+    return true;
+  };
+  const temFiltroLocal = !!(busca || statusFiltro || catFiltro || empresaFiltro || dataInicio || dataFim || todosPeriodos);
+  const limparFiltros = () => {
+    setBusca(""); setStatusFiltro(""); setCatFiltro(""); setEmpresaFiltro("");
+    setDataInicio(""); setDataFim(""); setCampoData("vencimento"); setTodosPeriodos(false);
+  };
+
   const debitos = lancamentos
     .filter((l) => l.tipo === "debito")
-    .filter((l) => todosPeriodos || l.competencia === competencia)
+    .filter((l) => (intervaloAtivo ? noIntervalo(l) : todosPeriodos || l.competencia === competencia))
+    .filter((l) => !empresaFiltro || l.empresaId === empresaFiltro)
     .filter((l) => !statusFiltro || l.status === statusFiltro)
     .filter((l) => !catFiltro || l.categoriaId === catFiltro)
     .map((l) => ({
@@ -67,7 +87,9 @@ export default function ContasPagar() {
     })
 
   const [anoComp, mesComp] = competencia.split("-");
-  const periodoLabel = todosPeriodos ? "todos os períodos" : `${mesComp}/${anoComp}`;
+  const periodoLabel = intervaloAtivo
+    ? `${campoData === "emissao" ? "emissão" : "vencimento"} ${dataInicio ? fmtData(dataInicio) : "…"} a ${dataFim ? fmtData(dataFim) : "…"}`
+    : todosPeriodos ? "todos os períodos" : `${mesComp}/${anoComp}`;
 
   const total = debitos.reduce((a, l) => a + l.valor, 0);
   const pago = debitos.filter((l) => l.status === "pago").reduce((a, l) => a + l.valor, 0);
@@ -174,6 +196,48 @@ export default function ContasPagar() {
           />
           Considerar todos os períodos
         </label>
+        {temFiltroLocal && (
+          <Button size="sm" variant="outline" onClick={limparFiltros}>Limpar filtros</Button>
+        )}
+      </div>
+
+      {/* Empresa + período por emissão/vencimento */}
+      <div className="flex flex-wrap items-end gap-3">
+        <select className="flex h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring w-56" value={empresaFiltro} onChange={(e) => setEmpresaFiltro(e.target.value)}>
+          <option value="">Todas as empresas</option>
+          {empresas.map((e) => (
+            <option key={e.id} value={e.id}>{e.nomeFantasia}</option>
+          ))}
+        </select>
+        <fieldset className="flex h-9 items-center gap-4 rounded-md border border-input bg-background px-3 text-sm shadow-sm">
+          <legend className="sr-only">Filtrar período por</legend>
+          {(["vencimento", "emissao"] as const).map((c) => (
+            <label key={c} className="flex items-center gap-1.5 cursor-pointer select-none">
+              <input
+                type="radio"
+                name="campoData"
+                className="h-4 w-4 accent-primary"
+                checked={campoData === c}
+                onChange={() => setCampoData(c)}
+              />
+              {c === "vencimento" ? "Vencimento" : "Emissão"}
+            </label>
+          ))}
+        </fieldset>
+        <label className="flex flex-col gap-0.5 text-xs text-muted-foreground">
+          Data inicial
+          <input type="date" className="flex h-9 rounded-md border border-input bg-background px-3 py-1 text-sm text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" value={dataInicio} max={dataFim || undefined} onChange={(e) => setDataInicio(e.target.value)} />
+        </label>
+        <label className="flex flex-col gap-0.5 text-xs text-muted-foreground">
+          Data final
+          <input type="date" className="flex h-9 rounded-md border border-input bg-background px-3 py-1 text-sm text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" value={dataFim} min={dataInicio || undefined} onChange={(e) => setDataFim(e.target.value)} />
+        </label>
+        {intervaloInvalido && (
+          <p className="text-xs text-destructive pb-2">A data final deve ser igual ou posterior à inicial.</p>
+        )}
+        {intervaloAtivo && (
+          <p className="text-xs text-muted-foreground pb-2">O intervalo de datas substitui o filtro de mês/ano da barra superior.</p>
+        )}
       </div>
 
       {/* Tabela */}
