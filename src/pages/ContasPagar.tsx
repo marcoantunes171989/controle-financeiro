@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useOutletContext } from "react-router-dom";
 import { format } from "date-fns";
 import { useLancamentos } from "../hooks/useLancamentos";
 import { useEmpresas } from "../hooks/useEmpresas";
@@ -18,7 +19,10 @@ import LancamentoDetalheModal from "../components/shared/LancamentoDetalheModal"
 import AnexosModal from "../components/shared/AnexosModal";
 import ConfirmDialog from "../components/ui/ConfirmDialog";
 
+type OutletCtx = { competencia: string; setCompetencia: (c: string) => void };
+
 export default function ContasPagar() {
+  const { competencia } = useOutletContext<OutletCtx>();
   const { lancamentos, deleteLancamento, baixarLancamento } = useLancamentos();
   const { empresas } = useEmpresas();
   const { categorias } = useCategorias();
@@ -27,6 +31,7 @@ export default function ContasPagar() {
   const [busca, setBusca] = useState("");
   const [statusFiltro, setStatusFiltro] = useState("");
   const [catFiltro, setCatFiltro] = useState("");
+  const [todosPeriodos, setTodosPeriodos] = useState(false);
 
   const [detalhe, setDetalhe] = useState<Lancamento | null>(null);
   const [anexosLanc, setAnexosLanc] = useState<Lancamento | null>(null);
@@ -40,6 +45,7 @@ export default function ContasPagar() {
 
   const debitos = lancamentos
     .filter((l) => l.tipo === "debito")
+    .filter((l) => todosPeriodos || l.competencia === competencia)
     .filter((l) => !statusFiltro || l.status === statusFiltro)
     .filter((l) => !catFiltro || l.categoriaId === catFiltro)
     .map((l) => ({
@@ -59,6 +65,9 @@ export default function ContasPagar() {
         l.status,
       ].some((v) => v.toLowerCase().includes(q));
     })
+
+  const [anoComp, mesComp] = competencia.split("-");
+  const periodoLabel = todosPeriodos ? "todos os períodos" : `${mesComp}/${anoComp}`;
 
   const total = debitos.reduce((a, l) => a + l.valor, 0);
   const pago = debitos.filter((l) => l.status === "pago").reduce((a, l) => a + l.valor, 0);
@@ -156,6 +165,15 @@ export default function ContasPagar() {
             <option key={c.id} value={c.id}>{c.nome}</option>
           ))}
         </select>
+        <label className="flex h-9 items-center gap-2 rounded-md border border-input bg-background px-3 text-sm shadow-sm cursor-pointer select-none">
+          <input
+            type="checkbox"
+            className="h-4 w-4 accent-primary"
+            checked={todosPeriodos}
+            onChange={(e) => setTodosPeriodos(e.target.checked)}
+          />
+          Considerar todos os períodos
+        </label>
       </div>
 
       {/* Tabela */}
@@ -168,6 +186,7 @@ export default function ContasPagar() {
       />
 
       <div className="flex justify-end gap-4 text-sm text-muted-foreground px-4">
+        <span>Período: <strong className="text-foreground">{periodoLabel}</strong></span>
         <span>Total filtrado: <strong className="text-foreground">{fmtMoeda(total)}</strong></span>
       </div>
 
