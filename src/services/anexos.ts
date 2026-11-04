@@ -28,9 +28,24 @@ function guessMimeType(nome: string): string {
   return 'application/octet-stream';
 }
 
+/**
+ * O Storage do Supabase rejeita chaves com acentos e símbolos (ex.: "Boleto março (2ª via).pdf").
+ * Sanitiza apenas o caminho de armazenamento; o nome original continua salvo em `nome`.
+ */
+export function sanitizarNomeArquivo(nome: string): string {
+  const idx = nome.lastIndexOf('.');
+  const base = idx > 0 ? nome.slice(0, idx) : nome;
+  const ext = idx > 0 ? nome.slice(idx + 1) : '';
+  const limpar = (t: string) =>
+    t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Za-z0-9._-]+/g, '_').replace(/^_+|_+$/g, '');
+  const baseLimpa = limpar(base).slice(0, 100) || 'arquivo';
+  const extLimpa = limpar(ext).slice(0, 10);
+  return extLimpa ? `${baseLimpa}.${extLimpa}` : baseLimpa;
+}
+
 export async function uploadAnexo(lancamentoId: string, file: File): Promise<void> {
   const userId = await getUserId();
-  const storagePath = `${userId}/${lancamentoId}/${Date.now()}_${file.name}`;
+  const storagePath = `${userId}/${lancamentoId}/${Date.now()}_${sanitizarNomeArquivo(file.name)}`;
 
   const { error: uploadError } = await supabase.storage
     .from('comprovantes')
