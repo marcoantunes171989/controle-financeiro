@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useOutletContext } from "react-router-dom";
 import { format } from "date-fns";
 import { useLancamentos } from "../hooks/useLancamentos";
 import { useEmpresas } from "../hooks/useEmpresas";
@@ -9,6 +10,8 @@ import { fmtMoeda, fmtData } from "../utils/format";
 import Table from "../components/ui/Table";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
+import PainelFiltros from "../components/shared/PainelFiltros";
+import { useFiltrosLancamentos } from "../hooks/useFiltrosLancamentos";
 import StatusBadge from "../components/shared/StatusBadge";
 import KpiCard from "../components/shared/KpiCard";
 import { ArrowUpCircle, TrendingUp, Clock, AlertCircle, Paperclip } from "lucide-react";
@@ -18,15 +21,15 @@ import LancamentoDetalheModal from "../components/shared/LancamentoDetalheModal"
 import AnexosModal from "../components/shared/AnexosModal";
 import ConfirmDialog from "../components/ui/ConfirmDialog";
 
+type OutletCtx = { competencia: string; setCompetencia: (c: string) => void };
+
 export default function ContasReceber() {
+  const { competencia } = useOutletContext<OutletCtx>();
   const { lancamentos, deleteLancamento, baixarLancamento } = useLancamentos();
   const { empresas } = useEmpresas();
   const { categorias } = useCategorias();
   const { toast } = useToast();
 
-  const [busca, setBusca] = useState("");
-  const [statusFiltro, setStatusFiltro] = useState("");
-  const [catFiltro, setCatFiltro] = useState("");
   const [detalhe, setDetalhe] = useState<Lancamento | null>(null);
   const [anexosLanc, setAnexosLanc] = useState<Lancamento | null>(null);
   const [modalBaixa, setModalBaixa] = useState<Lancamento | null>(null);
@@ -35,34 +38,15 @@ export default function ContasReceber() {
   const [anexosBaixa, setAnexosBaixa] = useState<File[]>([]);
   const [dropKey, setDropKey] = useState(0);
 
-  const q = busca.trim().toLowerCase();
-
-  const creditos = lancamentos
-    .filter((l) => l.tipo === "credito")
-    .filter((l) => !statusFiltro || l.status === statusFiltro)
-    .filter((l) => !catFiltro || l.categoriaId === catFiltro)
-    .map((l) => ({
-      ...l,
-      empresa: empresas.find((e) => e.id === l.empresaId),
-      categoria: categorias.find((c) => c.id === l.categoriaId),
-    }))
-    .filter((l) => {
-      if (!q) return true;
-      return [
-        l.descricao,
-        l.empresa?.nomeFantasia ?? "",
-        l.categoria?.nome ?? "",
-        fmtData(l.dataEmissao),
-        fmtData(l.dataVencimento),
-        fmtMoeda(l.valor),
-        l.status,
-      ].some((v) => v.toLowerCase().includes(q));
-    })
-
+  const f = useFiltrosLancamentos({ tipo: "credito", lancamentos, empresas, categorias, competencia });
+  const creditos = f.itens;
   const total = creditos.reduce((a, l) => a + l.valor, 0);
-  const recebido = creditos.filter((l) => l.status === "recebido").reduce((a, l) => a + l.valor, 0);
-  const pendente = creditos.filter((l) => l.status === "pendente").reduce((a, l) => a + l.valor, 0);
-  const vencido = creditos.filter((l) => l.status === "vencido").reduce((a, l) => a + l.valor, 0);
+  // Cartões ignoram só o filtro de status, para mostrar a distribuição.
+  const somar = (st?: string) => f.kpiItens.filter((l) => !st || l.status === st).reduce((a, l) => a + l.valor, 0);
+  const totalKpi = somar();
+  const recebido = somar("recebido");
+  const pendente = somar("pendente");
+  const vencido = somar("vencido");
 
   const fecharModalBaixa = () => {
     setModalBaixa(null);
@@ -132,27 +116,13 @@ export default function ContasReceber() {
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-        <KpiCard title="Total" value={total} icon={<ArrowUpCircle size={18} />} colorVariant="blue" />
+        <KpiCard title="Total" value={totalKpi} icon={<ArrowUpCircle size={18} />} colorVariant="blue" />
         <KpiCard title="Recebido" value={recebido} icon={<TrendingUp size={18} />} colorVariant="green" />
         <KpiCard title="Pendente" value={pendente} icon={<Clock size={18} />} colorVariant="amber" />
         <KpiCard title="Vencido" value={vencido} icon={<AlertCircle size={18} />} colorVariant="red" />
       </div>
 
-      <div className="flex flex-wrap gap-3">
-        <input className="flex h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring w-48 flex-1 placeholder:text-muted-foreground" placeholder="Buscar..." value={busca} onChange={(e) => setBusca(e.target.value)} />
-        <select className="flex h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring w-40" value={statusFiltro} onChange={(e) => setStatusFiltro(e.target.value)}>
-          <option value="">Todos os status</option>
-          <option value="pendente">Pendente</option>
-          <option value="recebido">Recebido</option>
-          <option value="vencido">Vencido</option>
-        </select>
-        <select className="flex h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring w-48" value={catFiltro} onChange={(e) => setCatFiltro(e.target.value)}>
-          <option value="">Todas categorias</option>
-          {categorias.filter((c) => c.tipo === "credito").map((c) => (
-            <option key={c.id} value={c.id}>{c.nome}</option>
-          ))}
-        </select>
-      </div>
+      <PainelFiltros f={f} />
 
       <Table
         columns={columns}
@@ -163,6 +133,8 @@ export default function ContasReceber() {
       />
 
       <div className="flex justify-end gap-4 text-sm text-muted-foreground px-4">
+        <span>Período: <strong className="text-foreground">{f.periodoLabel}</strong></span>
+        <span>Lançamentos: <strong className="text-foreground">{creditos.length}</strong></span>
         <span>Total filtrado: <strong className="text-foreground">{fmtMoeda(total)}</strong></span>
       </div>
 

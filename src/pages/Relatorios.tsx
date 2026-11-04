@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useOutletContext } from "react-router-dom";
 import { format } from "date-fns";
 import { useLancamentos } from "../hooks/useLancamentos";
 import { useEmpresas } from "../hooks/useEmpresas";
@@ -8,29 +8,23 @@ import { calcularPercentual, calcFluxoMensal } from "../utils/calculos";
 import FluxoBarChart from "../components/shared/FluxoBarChart";
 import KpiCard from "../components/shared/KpiCard";
 import Table from "../components/ui/Table";
+import PainelFiltros from "../components/shared/PainelFiltros";
+import { useFiltrosLancamentos } from "../hooks/useFiltrosLancamentos";
 import { Button } from "../components/ui/Button";
 import { TrendingUp, TrendingDown, Scale, Percent, Download } from "lucide-react";
 
+type OutletCtx = { competencia: string; setCompetencia: (c: string) => void };
+
 export default function Relatorios() {
+  const { competencia } = useOutletContext<OutletCtx>();
   const { lancamentos } = useLancamentos();
   const { empresas } = useEmpresas();
   const { categorias } = useCategorias();
 
-  const [empFiltro, setEmpFiltro] = useState("");
-  const [catFiltro, setCatFiltro] = useState("");
-  const [compFiltro, setCompFiltro] = useState("");
-
   const fluxo = calcFluxoMensal(lancamentos, new Date().getFullYear());
 
-  const filtrados = lancamentos
-    .filter((l) => !empFiltro || l.empresaId === empFiltro)
-    .filter((l) => !catFiltro || l.categoriaId === catFiltro)
-    .filter((l) => !compFiltro || l.competencia === compFiltro)
-    .map((l) => ({
-      ...l,
-      empresa: empresas.find((e) => e.id === l.empresaId),
-      categoria: categorias.find((c) => c.id === l.categoriaId),
-    }))
+  const f = useFiltrosLancamentos({ lancamentos, empresas, categorias, competencia });
+  const filtrados = f.itens;
 
   const receitas = filtrados.filter((l) => l.tipo === "credito").reduce((a, l) => a + l.valor, 0);
   const despesas = filtrados.filter((l) => l.tipo === "debito").reduce((a, l) => a + l.valor, 0);
@@ -46,8 +40,6 @@ export default function Relatorios() {
     .sort((a, b) => b.valor - a.valor);
 
   const maxRanking = ranking[0]?.valor ?? 1;
-
-  const inputClass = "flex h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring w-48";
 
   const exportarCSV = () => {
     const headers = ["ID", "Tipo", "Descricao", "Empresa", "Categoria", "Valor", "Vencimento", "Status"];
@@ -91,27 +83,15 @@ export default function Relatorios() {
 
   return (
     <div className="space-y-6">
-      {/* Filtros */}
-      <div className="flex flex-wrap gap-3">
-        <select className={inputClass} value={empFiltro} onChange={(e) => setEmpFiltro(e.target.value)}>
-          <option value="">Todas empresas</option>
-          {empresas.map((e) => <option key={e.id} value={e.id}>{e.nomeFantasia}</option>)}
-        </select>
-        <select className={inputClass} value={catFiltro} onChange={(e) => setCatFiltro(e.target.value)}>
-          <option value="">Todas categorias</option>
-          {categorias.map((c) => <option key={c.id} value={c.id}>{c.nome}</option>)}
-        </select>
-        <select className={inputClass} value={compFiltro} onChange={(e) => setCompFiltro(e.target.value)}>
-          <option value="">Toda competencia</option>
-          {Array.from(new Set(lancamentos.map((l) => l.competencia))).sort().reverse().map((c) => (
-            <option key={c} value={c}>{c}</option>
-          ))}
-        </select>
-        <Button variant="outline" onClick={exportarCSV}>
-          <Download size={14} />
-          Exportar CSV
-        </Button>
-      </div>
+      <PainelFiltros
+        f={f}
+        acoes={
+          <Button variant="outline" onClick={exportarCSV}>
+            <Download size={14} />
+            Exportar CSV
+          </Button>
+        }
+      />
 
       {/* KPIs */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
