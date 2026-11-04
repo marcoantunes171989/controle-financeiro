@@ -10,6 +10,7 @@ import Agendamento from './pages/Agendamento';
 import Empresas from './pages/Empresas';
 import Categorias from './pages/Categorias';
 import Relatorios from './pages/Relatorios';
+import AnaliseGerencial from './pages/AnaliseGerencial';
 
 const router = createBrowserRouter([
   {
@@ -26,6 +27,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Navigate to="/dashboard" replace /> },
       { path: 'dashboard', element: <Dashboard /> },
+      { path: 'analise', element: <AnaliseGerencial /> },
       { path: 'lancamentos', element: <Lancamentos /> },
       { path: 'pagar', element: <ContasPagar /> },
       { path: 'receber', element: <ContasReceber /> },

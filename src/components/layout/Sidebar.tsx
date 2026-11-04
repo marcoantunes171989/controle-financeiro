@@ -9,6 +9,7 @@ import {
   BarChart3,
   TrendingDown,
   Plus,
+  LineChart,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLancamentos } from "../../hooks/useLancamentos";
@@ -39,6 +40,7 @@ export default function Sidebar() {
       label: "Dashboard",
       items: [
         { to: "/dashboard", label: "Dashboard", icon: <LayoutDashboard size={16} /> },
+        { to: "/analise", label: "Analise Gerencial", icon: <LineChart size={16} /> },
       ],
     },
     {

@@ -16,6 +16,7 @@ import { useAuth } from "../../contexts/AuthContext";
 
 const routeTitles: Record<string, string> = {
   "/dashboard": "Dashboard",
+  "/analise": "Analise Gerencial",
   "/lancamentos": "Lancamentos",
   "/pagar": "Contas a Pagar",
   "/receber": "Contas a Receber",
