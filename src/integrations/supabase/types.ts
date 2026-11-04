@@ -97,6 +97,9 @@ export interface Database {
           numero_parcelas: number | null;
           parcela_atual: number | null;
           dia_vencimento: number | null;
+          quantidade_meses: number | null;
+          dias_antecipacao: number | null;
+          data_antecipacao: string | null;
           observacoes: string | null;
           competencia: string;
           user_id: string;
@@ -120,6 +123,9 @@ export interface Database {
           numero_parcelas?: number | null;
           parcela_atual?: number | null;
           dia_vencimento?: number | null;
+          quantidade_meses?: number | null;
+          dias_antecipacao?: number | null;
+          data_antecipacao?: string | null;
           observacoes?: string | null;
           competencia: string;
           user_id: string;
@@ -143,6 +149,9 @@ export interface Database {
           numero_parcelas?: number | null;
           parcela_atual?: number | null;
           dia_vencimento?: number | null;
+          quantidade_meses?: number | null;
+          dias_antecipacao?: number | null;
+          data_antecipacao?: string | null;
           observacoes?: string | null;
           competencia?: string;
           user_id?: string;

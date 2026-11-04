@@ -63,6 +63,9 @@ export interface Lancamento {
   parcelaAtual?: number;
   parcelas?: Parcela[];
   diaVencimento?: number;
+  quantidadeMeses?: number;
+  diasAntecipacao?: number;
+  dataAntecipacao?: string;
   anexos: Anexo[];
   observacoes?: string;
   competencia: string;

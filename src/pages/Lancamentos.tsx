@@ -82,6 +82,12 @@ export default function Lancamentos() {
   const tipoRecorrencia = watch("tipoRecorrencia");
   const numeroParcelas = watch("numeroParcelas") ?? 1;
   const diaVencimentoWatch = watch("diaVencimento");
+  const recorrenciaWatch = watch("recorrencia");
+  const quantidadeMesesWatch = watch("quantidadeMeses");
+  const INTERVALO_MESES: Record<string, number> = { mensal: 1, bimestral: 2, trimestral: 3, semestral: 6, anual: 12 };
+  const totalTitulos = recorrenciaWatch && quantidadeMesesWatch && quantidadeMesesWatch > 0
+    ? Math.max(1, Math.ceil(quantidadeMesesWatch / INTERVALO_MESES[recorrenciaWatch]))
+    : 0;
   const valorNum = maskParse(valorDisplay);
 
   useEffect(() => {
@@ -113,7 +119,8 @@ export default function Lancamentos() {
         dataEmissao: data.dataEmissao, dataVencimento: data.dataVencimento,
         status: "pendente", tipoRecorrencia: data.tipoRecorrencia,
         recorrencia: data.recorrencia, numeroParcelas: data.numeroParcelas,
-        diaVencimento: data.diaVencimento, observacoes: data.observacoes,
+        diaVencimento: data.diaVencimento, quantidadeMeses: data.quantidadeMeses,
+        diasAntecipacao: data.diasAntecipacao, observacoes: data.observacoes,
         anexos: [], competencia: data.dataVencimento.substring(0, 7),
       });
       toast({ title: "Lançamento salvo com sucesso!", variant: "success" });
@@ -293,7 +300,7 @@ export default function Lancamentos() {
             <FieldLabel icon={SplitSquareHorizontal}>Tipo de pagamento</FieldLabel>
             <div className="grid grid-cols-3 gap-2">
               {(["avista", "fixo", "parcelas"] as const).map((tr) => {
-                const labels = { avista: "À Vista", fixo: "Conta Fixa", parcelas: "Parcelado" };
+                const labels = { avista: "À Vista", fixo: "Agendamento", parcelas: "Parcelado" };
                 const icons = { avista: DollarSign, fixo: Repeat, parcelas: SplitSquareHorizontal };
                 const Icon = icons[tr];
                 return (
@@ -346,7 +353,7 @@ export default function Lancamentos() {
             </div>
           )}
 
-          {/* ── Conta fixa (condicional) ── */}
+          {/* ── Agendamento (condicional) ── */}
           {tipoRecorrencia === "fixo" && (
             <div className="p-4 bg-muted/60 rounded-xl border border-border grid grid-cols-2 gap-3">
               <div>
@@ -374,6 +381,31 @@ export default function Lancamentos() {
                 />
                 <FieldError message={errors.diaVencimento?.message} />
               </div>
+              <div>
+                <FieldLabel icon={Hash} required>Quantidade de meses</FieldLabel>
+                <input
+                  type="number" min={1} max={120}
+                  className={cn(fieldBase, errors.quantidadeMeses && "border-destructive")}
+                  placeholder="Ex: 12"
+                  {...register("quantidadeMeses", { valueAsNumber: true })}
+                />
+                <FieldError message={errors.quantidadeMeses?.message} />
+              </div>
+              <div>
+                <FieldLabel icon={CalendarClock}>Antecipação (dias)</FieldLabel>
+                <input
+                  type="number" min={0} max={60}
+                  className={cn(fieldBase, errors.diasAntecipacao && "border-destructive")}
+                  placeholder="Ex: 2 (0 = sem antecipação)"
+                  {...register("diasAntecipacao", { valueAsNumber: true })}
+                />
+                <FieldError message={errors.diasAntecipacao?.message} />
+              </div>
+              {totalTitulos > 0 && (
+                <p className="col-span-2 text-xs text-muted-foreground">
+                  Serão gerados <strong className="text-foreground">{totalTitulos}</strong> título(s), editáveis individualmente depois.
+                </p>
+              )}
             </div>
           )}
 

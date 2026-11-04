@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { format, parseISO, isBefore, startOfMonth, addMonths } from 'date-fns';
+import { format, parseISO, isBefore, startOfMonth, addMonths, subDays } from 'date-fns';
 import { supabase } from '../integrations/supabase/client';
 import { uploadAnexos } from '../services/anexos';
 import type { Lancamento } from '../types';
@@ -25,6 +25,9 @@ function toLancamento(row: Row): Lancamento {
     numeroParcelas: row.numero_parcelas ?? undefined,
     parcelaAtual: row.parcela_atual ?? undefined,
     diaVencimento: row.dia_vencimento ?? undefined,
+    quantidadeMeses: row.quantidade_meses ?? undefined,
+    diasAntecipacao: row.dias_antecipacao ?? undefined,
+    dataAntecipacao: row.data_antecipacao ?? undefined,
     observacoes: row.observacoes ?? undefined,
     competencia: row.competencia,
     createdAt: row.created_at,
@@ -99,7 +102,7 @@ export function useLancamentos() {
         return;
       }
 
-      // Conta Fixa: gera entradas reais para os próximos ~2 anos
+      // Agendamento: gera um título real por ocorrência dentro da quantidade de meses informada
       if (dados.tipoRecorrencia === 'fixo') {
         const INTERVALO_MESES: Record<string, number> = {
           mensal: 1, bimestral: 2, trimestral: 3, semestral: 6, anual: 12,
@@ -110,7 +113,9 @@ export function useLancamentos() {
         const specifiedMonth = startOfMonth(parseISO(dados.dataVencimento));
         const currentMonth = startOfMonth(new Date());
         let mesCursor = specifiedMonth >= currentMonth ? specifiedMonth : currentMonth;
-        const numEntradas = Math.ceil(24 / intervalo); // ~2 anos de ocorrências
+        const quantidadeMeses = dados.quantidadeMeses ?? 24;
+        const numEntradas = Math.max(1, Math.ceil(quantidadeMeses / intervalo));
+        const diasAntecipacao = dados.diasAntecipacao ?? 0;
         const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
 
         const rows = Array.from({ length: numEntradas }, () => {
@@ -132,6 +137,9 @@ export function useLancamentos() {
             numero_parcelas: null,
             parcela_atual: null,
             dia_vencimento: diaVenc,
+            quantidade_meses: quantidadeMeses,
+            dias_antecipacao: diasAntecipacao,
+            data_antecipacao: format(subDays(vencDate, diasAntecipacao), 'yyyy-MM-dd'),
             observacoes: dados.observacoes ?? null,
             competencia: format(mesCursor, 'yyyy-MM'),
             user_id: userId,
@@ -194,6 +202,9 @@ export function useLancamentos() {
       if (dados.numeroParcelas !== undefined) patch.numero_parcelas = dados.numeroParcelas;
       if (dados.parcelaAtual !== undefined) patch.parcela_atual = dados.parcelaAtual;
       if (dados.diaVencimento !== undefined) patch.dia_vencimento = dados.diaVencimento;
+      if (dados.quantidadeMeses !== undefined) patch.quantidade_meses = dados.quantidadeMeses;
+      if (dados.diasAntecipacao !== undefined) patch.dias_antecipacao = dados.diasAntecipacao;
+      if (dados.dataAntecipacao !== undefined) patch.data_antecipacao = dados.dataAntecipacao;
       if (dados.observacoes !== undefined) patch.observacoes = dados.observacoes;
       if (dados.competencia !== undefined) patch.competencia = dados.competencia;
       const { error } = await supabase.from('lancamentos').update(patch).eq('id', id);

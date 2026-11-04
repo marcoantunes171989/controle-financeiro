@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { format, parseISO, subDays } from "date-fns";
 import { FileText, Download, Trash2, Paperclip, Upload, Eye, ChevronLeft, ChevronRight, X as XIcon, FileImage } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLancamentos } from "../../hooks/useLancamentos";
@@ -176,6 +177,8 @@ export default function LancamentoDetalheModal({ lancamento, open, onClose }: Pr
       recorrencia: lancamento.recorrencia,
       numeroParcelas: lancamento.numeroParcelas,
       diaVencimento: lancamento.diaVencimento,
+      quantidadeMeses: lancamento.quantidadeMeses ?? 24,
+      diasAntecipacao: lancamento.diasAntecipacao ?? 0,
       observacoes: lancamento.observacoes ?? "",
     });
     setValorDisplay(
@@ -241,6 +244,8 @@ export default function LancamentoDetalheModal({ lancamento, open, onClose }: Pr
         recorrencia: data.recorrencia,
         numeroParcelas: data.numeroParcelas,
         diaVencimento: data.diaVencimento,
+        diasAntecipacao: data.diasAntecipacao ?? 0,
+        dataAntecipacao: format(subDays(parseISO(data.dataVencimento), data.diasAntecipacao ?? 0), "yyyy-MM-dd"),
         observacoes: data.observacoes,
         competencia: data.dataVencimento.substring(0, 7),
       });
@@ -335,7 +340,7 @@ export default function LancamentoDetalheModal({ lancamento, open, onClose }: Pr
                         : "bg-background text-muted-foreground border-input hover:bg-accent"
                     )}
                   >
-                    {tr === "avista" ? "A Vista" : tr === "fixo" ? "Conta Fixa" : "Parcelado"}
+                    {tr === "avista" ? "A Vista" : tr === "fixo" ? "Agendamento" : "Parcelado"}
                   </button>
                 ))}
               </div>
@@ -360,6 +365,7 @@ export default function LancamentoDetalheModal({ lancamento, open, onClose }: Pr
                   </select>
                 </div>
                 <Input type="number" label="Dia de vencimento" min={1} max={31} {...register("diaVencimento", { valueAsNumber: true })} />
+                <Input type="number" label="Antecipação (dias)" min={0} max={60} error={errors.diasAntecipacao?.message} {...register("diasAntecipacao", { valueAsNumber: true })} />
               </div>
             )}
 

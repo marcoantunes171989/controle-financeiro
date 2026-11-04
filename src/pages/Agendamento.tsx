@@ -64,6 +64,9 @@ function projetarFixos(lancamentos: EnrichedLancamento[], mesAlvo: Date): Enrich
     // Do not project before or on the origin month (real entry already there)
     if (diff <= 0) continue;
 
+    // Agendamento com quantidade de meses definida: todos os títulos já existem de fato
+    if (l.quantidadeMeses) continue;
+
     // Skip if a real entry already exists for this month (user manually created it)
     const jaExiste = lancamentos.some(
       (r) =>
@@ -248,7 +251,7 @@ export default function Agendamento() {
           <div className="mt-3 pt-3 border-t border-border flex items-center gap-4 text-[10px] text-muted-foreground flex-wrap">
             <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-destructive inline-block" /> Vencimento real</span>
             <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-300 border border-destructive inline-block" /> Vencimento projetado</span>
-            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-100 border border-red-300 inline-block" /> Conta fixa (referência)</span>
+            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-100 border border-red-300 inline-block" /> Agendamento (referência)</span>
           </div>
 
           {diaSelecionado && lancamentosDiaSelecionado.length > 0 && (
@@ -315,10 +318,15 @@ export default function Agendamento() {
 
         {contasFixas.length > 0 && (
           <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-4">
-            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Contas Fixas</h3>
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Agendamentos</h3>
             <div className="space-y-2.5">
               {contasFixas.slice(0, 6).map((l) => {
-                const proxData = proximaOcorrenciaFixo(l, refMes);
+                const proxData = l.quantidadeMeses
+                  ? (enriched
+                      .filter((r) => r.tipoRecorrencia === "fixo" && r.empresaId === l.empresaId && r.categoriaId === l.categoriaId && r.descricao === l.descricao && parseISO(r.dataVencimento) >= refMes)
+                      .map((r) => r.dataVencimento)
+                      .sort()[0] ?? null)
+                  : proximaOcorrenciaFixo(l, refMes);
                 const isDueThisMonth =
                   enriched.some(
                     (r) =>
@@ -339,7 +347,7 @@ export default function Agendamento() {
                       </span>
                     </div>
                     <p className="text-[10px] text-muted-foreground pl-5">
-                      {recorrenciaLabel[l.recorrencia ?? ""] ?? "—"} · próx. {fmtData(proxData)} · dia {l.diaVencimento ?? parseISO(l.dataVencimento).getDate()}
+                      {recorrenciaLabel[l.recorrencia ?? ""] ?? "—"} · {proxData ? `próx. ${fmtData(proxData)}` : "encerrado"} · dia {l.diaVencimento ?? parseISO(l.dataVencimento).getDate()}
                       {isDueThisMonth && <span className="ml-1 text-destructive font-medium">· vence este mês</span>}
                     </p>
                   </div>
