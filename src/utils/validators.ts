@@ -15,6 +15,8 @@ export const lancamentoSchema = z.object({
   numeroParcelas: z.number().int().min(2).max(120).optional(),
   recorrencia: z.enum(['mensal', 'bimestral', 'trimestral', 'semestral', 'anual']).optional(),
   diaVencimento: z.number().int().min(1).max(31).optional(),
+  mesInicial: z.preprocess(nanToUndefined, z.number().int().min(1).max(12).optional()),
+  anoInicial: z.preprocess(nanToUndefined, z.number().int().min(2000).max(2100).optional()),
   quantidadeMeses: z.preprocess(nanToUndefined, z.number().int().min(1, 'Mínimo 1 mês').max(120, 'Máximo 120 meses').optional()),
   diasAntecipacao: z.preprocess(nanToUndefined, z.number().int().min(0, 'Não pode ser negativo').max(60, 'Máximo 60 dias').optional()),
   observacoes: z.string().optional(),
