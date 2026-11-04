@@ -13,7 +13,7 @@ import { useEmpresas } from "../hooks/useEmpresas";
 import { useCategorias } from "../hooks/useCategorias";
 import { lancamentoSchema, LancamentoFormData } from "../utils/validators";
 import { calcularParcelasValor, calcularTotalParcelado } from "../utils/calculos";
-import { fmtMoeda } from "../utils/format";
+import { fmtMoeda, fmtData } from "../utils/format";
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
 import DropZone from "../components/ui/DropZone";
@@ -69,19 +69,28 @@ export default function Lancamentos() {
   const [arquivos, setArquivos] = useState<File[]>([]);
   const [dropKey, setDropKey] = useState(0);
 
-  const { register, handleSubmit, watch, reset, setValue,
+  const hojeRef = new Date();
+  const anoAtual = hojeRef.getFullYear();
+  const mesAtual = hojeRef.getMonth() + 1;
+  const MESES = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+
+  const { register, handleSubmit, watch, reset, setValue, setError,
     formState: { errors, isSubmitting } } = useForm<LancamentoFormData>({
     resolver: zodResolver(lancamentoSchema),
     defaultValues: {
       tipo: "debito",
       tipoRecorrencia: "avista",
       dataEmissao: format(new Date(), "yyyy-MM-dd"),
+      mesInicial: mesAtual,
+      anoInicial: anoAtual,
     },
   });
 
   const tipoRecorrencia = watch("tipoRecorrencia");
   const numeroParcelas = watch("numeroParcelas") ?? 1;
   const diaVencimentoWatch = watch("diaVencimento");
+  const mesInicialWatch = watch("mesInicial");
+  const anoInicialWatch = watch("anoInicial");
   const recorrenciaWatch = watch("recorrencia");
   const quantidadeMesesWatch = watch("quantidadeMeses");
   const INTERVALO_MESES: Record<string, number> = { mensal: 1, bimestral: 2, trimestral: 3, semestral: 6, anual: 12 };
@@ -90,16 +99,24 @@ export default function Lancamentos() {
     : 0;
   const valorNum = maskParse(valorDisplay);
 
+  // Agendamento não pode começar em mês passado: no ano corrente, só meses a partir do atual.
   useEffect(() => {
     if (tipoRecorrencia !== "fixo") return;
-    if (!diaVencimentoWatch || diaVencimentoWatch < 1 || diaVencimentoWatch > 31) {
+    if (anoInicialWatch === anoAtual && mesInicialWatch && mesInicialWatch < mesAtual) {
+      setValue("mesInicial", mesAtual);
+    }
+  }, [tipoRecorrencia, anoInicialWatch, mesInicialWatch, anoAtual, mesAtual, setValue]);
+
+  // Combina Mês + Ano iniciais + Dia de vencimento no primeiro vencimento.
+  useEffect(() => {
+    if (tipoRecorrencia !== "fixo") return;
+    if (!diaVencimentoWatch || diaVencimentoWatch < 1 || diaVencimentoWatch > 31 || !mesInicialWatch || !anoInicialWatch) {
       setValue("dataVencimento", ""); return;
     }
-    const hoje = new Date();
-    const maxDay = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0).getDate();
+    const maxDay = new Date(anoInicialWatch, mesInicialWatch, 0).getDate();
     const dia = Math.min(diaVencimentoWatch, maxDay);
-    setValue("dataVencimento", format(new Date(hoje.getFullYear(), hoje.getMonth(), dia), "yyyy-MM-dd"));
-  }, [tipoRecorrencia, diaVencimentoWatch, setValue]);
+    setValue("dataVencimento", format(new Date(anoInicialWatch, mesInicialWatch - 1, dia), "yyyy-MM-dd"));
+  }, [tipoRecorrencia, diaVencimentoWatch, mesInicialWatch, anoInicialWatch, setValue]);
 
   const handleTipoChange = (t: "credito" | "debito") => {
     setTipo(t);
@@ -108,6 +125,12 @@ export default function Lancamentos() {
   };
 
   const onSubmit = async (data: LancamentoFormData) => {
+    if (data.tipoRecorrencia === "fixo" && data.dataVencimento < format(new Date(), "yyyy-MM-dd")) {
+      setError("diaVencimento", {
+        message: "O primeiro vencimento não pode ser anterior a hoje. Escolha um dia a partir de hoje ou o próximo mês.",
+      });
+      return;
+    }
     const valorFinal = valorNum;
     const valorTotalFinal = data.tipoRecorrencia === "parcelas"
       ? calcularTotalParcelado(valorFinal, data.numeroParcelas ?? 1)
@@ -125,7 +148,7 @@ export default function Lancamentos() {
       });
       toast({ title: "Lançamento salvo com sucesso!", variant: "success" });
       const arquivosParaUpload = [...arquivos];
-      reset({ tipo, tipoRecorrencia: "avista", dataEmissao: format(new Date(), "yyyy-MM-dd") });
+      reset({ tipo, tipoRecorrencia: "avista", dataEmissao: format(new Date(), "yyyy-MM-dd"), mesInicial: mesAtual, anoInicial: anoAtual });
       setValorDisplay(""); setArquivos([]); setDropKey((k) => k + 1);
       if (id && arquivosParaUpload.length > 0) {
         uploadAnexos(id, arquivosParaUpload).catch(() => {
@@ -382,6 +405,30 @@ export default function Lancamentos() {
                 <FieldError message={errors.diaVencimento?.message} />
               </div>
               <div>
+                <FieldLabel icon={Calendar} required>Mês inicial</FieldLabel>
+                <select
+                  className={cn(fieldBase, errors.mesInicial && "border-destructive")}
+                  {...register("mesInicial", { setValueAs: (v) => Number(v) })}
+                >
+                  {MESES.map((nome, i) => (
+                    <option key={nome} value={i + 1} disabled={anoInicialWatch === anoAtual && i + 1 < mesAtual}>{nome}</option>
+                  ))}
+                </select>
+                <FieldError message={errors.mesInicial?.message} />
+              </div>
+              <div>
+                <FieldLabel icon={Calendar} required>Ano inicial</FieldLabel>
+                <select
+                  className={cn(fieldBase, errors.anoInicial && "border-destructive")}
+                  {...register("anoInicial", { setValueAs: (v) => Number(v) })}
+                >
+                  {Array.from({ length: 11 }, (_, i) => anoAtual + i).map((a) => (
+                    <option key={a} value={a}>{a}</option>
+                  ))}
+                </select>
+                <FieldError message={errors.anoInicial?.message} />
+              </div>
+              <div>
                 <FieldLabel icon={Hash} required>Quantidade de meses</FieldLabel>
                 <input
                   type="number" min={1} max={120}
@@ -391,9 +438,10 @@ export default function Lancamentos() {
                 />
                 <FieldError message={errors.quantidadeMeses?.message} />
               </div>
-              {totalTitulos > 0 && (
+              {(totalTitulos > 0 || watch("dataVencimento")) && (
                 <p className="col-span-2 text-xs text-muted-foreground">
-                  Serão gerados <strong className="text-foreground">{totalTitulos}</strong> título(s), editáveis individualmente depois.
+                  {watch("dataVencimento") && <>Primeiro vencimento: <strong className="text-foreground">{fmtData(watch("dataVencimento"))}</strong>. </>}
+                  {totalTitulos > 0 && <>Serão gerados <strong className="text-foreground">{totalTitulos}</strong> título(s), editáveis individualmente depois.</>}
                 </p>
               )}
             </div>
