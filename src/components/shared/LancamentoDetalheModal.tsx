@@ -365,7 +365,6 @@ export default function LancamentoDetalheModal({ lancamento, open, onClose }: Pr
                   </select>
                 </div>
                 <Input type="number" label="Dia de vencimento" min={1} max={31} {...register("diaVencimento", { valueAsNumber: true })} />
-                <Input type="number" label="Antecipação (dias)" min={0} max={60} error={errors.diasAntecipacao?.message} {...register("diasAntecipacao", { valueAsNumber: true })} />
               </div>
             )}
 

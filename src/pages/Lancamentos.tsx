@@ -391,16 +391,6 @@ export default function Lancamentos() {
                 />
                 <FieldError message={errors.quantidadeMeses?.message} />
               </div>
-              <div>
-                <FieldLabel icon={CalendarClock}>Antecipação (dias)</FieldLabel>
-                <input
-                  type="number" min={0} max={60}
-                  className={cn(fieldBase, errors.diasAntecipacao && "border-destructive")}
-                  placeholder="Ex: 2 (0 = sem antecipação)"
-                  {...register("diasAntecipacao", { valueAsNumber: true })}
-                />
-                <FieldError message={errors.diasAntecipacao?.message} />
-              </div>
               {totalTitulos > 0 && (
                 <p className="col-span-2 text-xs text-muted-foreground">
                   Serão gerados <strong className="text-foreground">{totalTitulos}</strong> título(s), editáveis individualmente depois.
