@@ -25,7 +25,16 @@ async function getUserId(): Promise<string> {
 export function useCategorias() {
   const qc = useQueryClient();
 
-  const { data: categoriasData, isLoading } = useQuery<Categoria[]>({
+  const {
+    data: categoriasData,
+    isLoading,
+    isPending,
+    isError,
+    error,
+    isSuccess,
+    isFetching,
+    refetch,
+  } = useQuery<Categoria[]>({
     queryKey: ['categorias'],
     queryFn: async (): Promise<Categoria[]> => {
       const { data, error } = await supabase
@@ -76,6 +85,12 @@ export function useCategorias() {
   return {
     categorias,
     isLoading,
+    isPending,
+    isError,
+    error,
+    isSuccess,
+    isFetching,
+    refetch,
     addCategoria: (dados: Omit<Categoria, 'id'>) => createMutation.mutateAsync(dados),
     updateCategoria: (id: string, dados: Partial<Categoria>) => updateMutation.mutateAsync({ id, dados }),
     deleteCategoria: (id: string) => deleteMutation.mutateAsync(id),

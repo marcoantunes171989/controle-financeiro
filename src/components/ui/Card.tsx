@@ -1,11 +1,11 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement> & { title?: string; padding?: string }>(
-  ({ className, title, children, ...props }, ref) => (
+const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement> & { title?: string; padding?: "sm" | "default" }>(
+  ({ className, title, padding = "default", children, ...props }, ref) => (
     <div ref={ref} className={cn("rounded-xl border bg-card text-card-foreground shadow-sm", className)} {...props}>
       {title && <div className="flex items-center px-5 py-3.5 border-b border-border"><h3 className="text-sm font-semibold">{title}</h3></div>}
-      <div className="p-5">{children}</div>
+      <div className={padding === "sm" ? "p-4" : "p-5"}>{children}</div>
     </div>
   )
 );

@@ -28,7 +28,12 @@ interface NavGroup {
   items: NavItem[];
 }
 
-export default function Sidebar() {
+interface SidebarProps {
+  isOpen?: boolean;
+  onNavigate?: () => void;
+}
+
+export default function Sidebar({ isOpen = false, onNavigate }: SidebarProps) {
   const { lancamentos } = useLancamentos();
   const { empresas } = useEmpresas();
 
@@ -68,7 +73,14 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="w-60 shrink-0 h-screen flex flex-col" style={{ backgroundColor: "hsl(var(--sidebar-background))", color: "hsl(var(--sidebar-foreground))", borderRight: "1px solid hsl(var(--sidebar-border))" }}>
+    <aside
+      className={cn(
+        "w-60 shrink-0 h-screen flex flex-col fixed inset-y-0 left-0 z-50 transition-transform duration-200 ease-in-out",
+        "md:static md:translate-x-0",
+        isOpen ? "translate-x-0" : "-translate-x-full"
+      )}
+      style={{ backgroundColor: "hsl(var(--sidebar-background))", color: "hsl(var(--sidebar-foreground))", borderRight: "1px solid hsl(var(--sidebar-border))" }}
+    >
       {/* Logo */}
       <div className="flex items-center gap-2.5 px-5 py-5" style={{ borderBottom: "1px solid hsl(var(--sidebar-border))" }}>
         <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: "hsl(var(--sidebar-primary))" }}>
@@ -87,6 +99,7 @@ export default function Sidebar() {
                 <li key={item.to}>
                   <NavLink
                     to={item.to}
+                    onClick={onNavigate}
                     className={({ isActive }) =>
                       cn(
                         "flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors",

@@ -53,7 +53,16 @@ async function getUserId(): Promise<string> {
 export function useLancamentos() {
   const qc = useQueryClient();
 
-  const { data: lancamentosData, isLoading } = useQuery<Lancamento[]>({
+  const {
+    data: lancamentosData,
+    isLoading,
+    isPending,
+    isError,
+    error,
+    isSuccess,
+    isFetching,
+    refetch,
+  } = useQuery<Lancamento[]>({
     queryKey: ['lancamentos'],
     queryFn: async (): Promise<Lancamento[]> => {
       const { data, error } = await supabase
@@ -240,6 +249,12 @@ export function useLancamentos() {
   return {
     lancamentos,
     isLoading,
+    isPending,
+    isError,
+    error,
+    isSuccess,
+    isFetching,
+    refetch,
     addLancamento: (dados: Omit<Lancamento, 'id' | 'createdAt' | 'updatedAt' | 'empresa' | 'categoria'>) =>
       createMutation.mutateAsync(dados),
     updateLancamento: (id: string, dados: Partial<Lancamento>) =>

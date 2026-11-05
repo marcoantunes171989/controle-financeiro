@@ -30,7 +30,16 @@ async function getUserId(): Promise<string> {
 export function useEmpresas() {
   const qc = useQueryClient();
 
-  const { data: empresasData, isLoading } = useQuery<Empresa[]>({
+  const {
+    data: empresasData,
+    isLoading,
+    isPending,
+    isError,
+    error,
+    isSuccess,
+    isFetching,
+    refetch,
+  } = useQuery<Empresa[]>({
     queryKey: ['empresas'],
     queryFn: async (): Promise<Empresa[]> => {
       const { data, error } = await supabase
@@ -92,6 +101,12 @@ export function useEmpresas() {
   return {
     empresas,
     isLoading,
+    isPending,
+    isError,
+    error,
+    isSuccess,
+    isFetching,
+    refetch,
     addEmpresa: (dados: Omit<Empresa, 'id' | 'createdAt'>) => createMutation.mutateAsync(dados),
     updateEmpresa: (id: string, dados: Partial<Empresa>) => updateMutation.mutateAsync({ id, dados }),
     deleteEmpresa: (id: string) => deleteMutation.mutateAsync(id),
