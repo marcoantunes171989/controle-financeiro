@@ -308,13 +308,13 @@ function despesasCategoriaParaDonut(
 /** Cartão de indicador que não pôde ser calculado com confiança (Seção 09). Nunca exibe zero no lugar. */
 function IndicadorIndisponivel({ title, icon, motivo }: { title: string; icon: React.ReactNode; motivo: string }) {
   return (
-    <div className="rounded-xl border border-l-4 border-slate-300 bg-slate-50 p-5 flex items-start gap-4">
-      <div className="p-2.5 rounded-lg bg-slate-100 text-slate-500">{icon}</div>
-      <div className="flex-1 min-w-0">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{title}</p>
-        <p className="text-lg font-semibold text-slate-500 mt-1">Indisponível</p>
-        <p className="text-xs text-slate-400 mt-1">{motivo}</p>
+    <div className="rounded-xl border border-l-4 border-slate-300 bg-slate-50 p-4 sm:p-5 flex flex-col gap-2">
+      <div className="flex items-center gap-2 sm:gap-3">
+        <div className="p-2 sm:p-2.5 rounded-lg bg-slate-100 text-slate-500 shrink-0">{icon}</div>
+        <p className="flex-1 min-w-0 text-xs font-medium text-muted-foreground uppercase tracking-wide break-words">{title}</p>
       </div>
+      <p className="text-lg font-semibold text-slate-500">Indisponível</p>
+      <p className="text-xs text-slate-400 break-words">{motivo}</p>
     </div>
   );
 }
@@ -472,9 +472,9 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       {/* Filtro de empresa */}
-      <div className="flex items-center justify-between">
-        <p className="text-xs text-muted-foreground">{rotuloPeriodo}</p>
-        <div className="w-64">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <p className="text-xs text-muted-foreground break-words">{rotuloPeriodo}</p>
+        <div className="w-full sm:w-64 shrink-0">
           <Select
             aria-label="Filtrar por empresa"
             options={empresaOptions}
@@ -520,7 +520,7 @@ export default function Dashboard() {
       {/* A. Resultado Realizado */}
       <div>
         <h2 className="text-sm font-semibold text-foreground mb-2">Resultado Realizado — Regime de Caixa</h2>
-        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           <KpiCard
             title="Receitas Recebidas"
             value={receitasRealizadas.total}
@@ -560,7 +560,7 @@ export default function Dashboard() {
       {/* B. Compromissos Financeiros */}
       <div>
         <h2 className="text-sm font-semibold text-foreground mb-2">Compromissos Financeiros — Previsão (vencimento)</h2>
-        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           <KpiCard
             title="Contas a Receber"
             value={receitasPrevistas.total.total}

@@ -936,3 +936,76 @@ describe('Dashboard — Ranking de Categorias (Microgate 06-B)', () => {
     expect(supabase.from).not.toHaveBeenCalled();
   });
 });
+
+describe('Dashboard — responsividade dos cards em smartphones (320–430px)', () => {
+  it('54 grades de indicadores usam uma coluna no mobile (grid-cols-1), duas a partir de sm e quatro a partir de xl', () => {
+    setup({
+      lancamentos: [
+        lancamento({ tipo: 'credito', status: 'recebido', dataPagamento: '2026-01-15', valor: 300 }),
+      ],
+    });
+    renderDashboard('2026-01');
+
+    const gradeResultado = screen.getByText('Receitas Recebidas').closest('div')!.parentElement!.parentElement!;
+    expect(gradeResultado).toHaveClass('grid-cols-1', 'sm:grid-cols-2', 'xl:grid-cols-4');
+
+    const gradeCompromissos = screen.getByText('Contas a Receber').closest('div')!.parentElement!.parentElement!;
+    expect(gradeCompromissos).toHaveClass('grid-cols-1', 'sm:grid-cols-2', 'xl:grid-cols-4');
+  });
+
+  it('55 o cabeçalho de período/filtro de empresa quebra em coluna no mobile (sem forçar scroll horizontal)', () => {
+    setup({});
+    renderDashboard('2026-01');
+
+    const seletor = screen.getByLabelText('Filtrar por empresa');
+    const seletorWrapper = seletor.closest('div')!.parentElement!;
+    expect(seletorWrapper).toHaveClass('w-full', 'sm:w-64');
+
+    const linhaFiltro = seletorWrapper.parentElement!;
+    expect(linhaFiltro).toHaveClass('flex-col', 'sm:flex-row');
+  });
+
+  it('56 valores monetários elevados e negativos permanecem completos (sem truncamento) nos cards do dashboard', () => {
+    setup({
+      lancamentos: [
+        lancamento({ tipo: 'debito', status: 'pago', dataPagamento: '2026-01-10', valor: 123456.78 }),
+      ],
+    });
+    renderDashboard('2026-01');
+
+    const cardResultado = screen.getByText('Resultado de Caixa').closest('div')!.parentElement!;
+    expect(cardResultado.textContent).toContain(fmtMoeda(-123456.78));
+    const valorResultado = cardResultado.querySelector('p.text-xl')!;
+    expect(valorResultado.textContent).toBe(fmtMoeda(-123456.78));
+    expect(valorResultado.className).not.toMatch(/truncate|overflow-hidden/);
+  });
+
+  it('57 indicador indisponível (margem sem receitas) também usa o espaçamento responsivo do card', () => {
+    setup({
+      lancamentos: [
+        lancamento({ tipo: 'debito', status: 'pago', dataPagamento: '2026-01-10', valor: 100 }),
+      ],
+    });
+    renderDashboard('2026-01');
+
+    const cardIndisponivel = screen.getByText('Margem de Caixa').closest('div')!.parentElement!;
+    expect(cardIndisponivel).toHaveClass('p-4', 'sm:p-5');
+  });
+
+  it('58 indicador indisponível exibe "Indisponível" e o motivo em linha própria, abaixo do ícone/título', () => {
+    setup({
+      lancamentos: [
+        lancamento({ tipo: 'debito', status: 'pago', dataPagamento: '2026-01-10', valor: 100 }),
+      ],
+    });
+    renderDashboard('2026-01');
+
+    const tituloLinha = screen.getByText('Margem de Caixa').closest('div')!;
+    const cardIndisponivel = tituloLinha.parentElement!;
+    const status = screen.getByText('Indisponível');
+
+    expect(status.parentElement).toBe(cardIndisponivel);
+    expect(status.parentElement).not.toBe(tituloLinha);
+    expect(cardIndisponivel.textContent).toMatch(/Indisponível/);
+  });
+});
