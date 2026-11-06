@@ -20,6 +20,7 @@ import DropZone from "../components/ui/DropZone";
 import LancamentoDetalheModal from "../components/shared/LancamentoDetalheModal";
 import AnexosModal from "../components/shared/AnexosModal";
 import ConfirmDialog from "../components/ui/ConfirmDialog";
+import LancamentoCardList from "../components/shared/LancamentoCardList";
 
 type OutletCtx = { competencia: string; setCompetencia: (c: string) => void };
 
@@ -48,6 +49,13 @@ export default function ContasPagar() {
   const pago = somar("pago");
   const pendente = somar("pendente");
   const vencido = somar("vencido");
+
+  const abrirModalBaixa = (l: Lancamento) => {
+    setModalBaixa(l);
+    setDataPagamento(format(new Date(), "yyyy-MM-dd"));
+    setAnexosBaixa([]);
+    setDropKey((k) => k + 1);
+  };
 
   const fecharModalBaixa = () => {
     setModalBaixa(null);
@@ -103,7 +111,7 @@ export default function ContasPagar() {
           <Paperclip size={14} />
         </button>
         {(l.status === "pendente" || l.status === "vencido") && (
-          <Button size="sm" variant="secondary" onClick={() => { setModalBaixa(l); setDataPagamento(format(new Date(), "yyyy-MM-dd")); setAnexosBaixa([]); setDropKey((k) => k + 1); }}>
+          <Button size="sm" variant="secondary" onClick={() => abrirModalBaixa(l as Lancamento)}>
             Baixar
           </Button>
         )}
@@ -117,7 +125,7 @@ export default function ContasPagar() {
   return (
     <div className="space-y-5">
       {/* KPIs */}
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         <KpiCard title="Total" value={totalKpi} icon={<ArrowDownCircle size={18} />} colorVariant="blue" />
         <KpiCard title="Pago" value={pago} icon={<TrendingDown size={18} />} colorVariant="green" />
         <KpiCard title="Pendente" value={pendente} icon={<Clock size={18} />} colorVariant="amber" />
@@ -126,16 +134,32 @@ export default function ContasPagar() {
 
       <PainelFiltros f={f} />
 
-      {/* Tabela */}
-      <Table
-        columns={columns}
-        data={debitos}
-        emptyMessage="Nenhuma conta a pagar encontrada"
-        defaultSortKey="dataVencimento"
-        onRowClick={(row) => setDetalhe(row as Lancamento)}
-      />
+      {/* Tabela (telas >= sm) */}
+      <div className="hidden sm:block">
+        <Table
+          columns={columns}
+          data={debitos}
+          emptyMessage="Nenhuma conta a pagar encontrada"
+          defaultSortKey="dataVencimento"
+          onRowClick={(row) => setDetalhe(row as Lancamento)}
+        />
+      </div>
 
-      <div className="flex justify-end gap-4 text-sm text-muted-foreground px-4">
+      {/* Cards (smartphones) */}
+      <div className="sm:hidden">
+        <LancamentoCardList
+          itens={debitos}
+          emptyMessage="Nenhuma conta a pagar encontrada"
+          valorClassName="text-destructive"
+          acaoLabel="Baixar"
+          onRowClick={(l) => setDetalhe(l)}
+          onAnexos={(l) => setAnexosLanc(l)}
+          onBaixa={abrirModalBaixa}
+          onExcluir={(l) => setConfirmExcluir({ id: l.id, descricao: l.descricao })}
+        />
+      </div>
+
+      <div className="flex flex-wrap justify-end gap-3 sm:gap-4 text-sm text-muted-foreground px-4">
         <span>Período: <strong className="text-foreground">{f.periodoLabel}</strong></span>
         <span>Lançamentos: <strong className="text-foreground">{debitos.length}</strong></span>
         <span>Total filtrado: <strong className="text-foreground">{fmtMoeda(total)}</strong></span>

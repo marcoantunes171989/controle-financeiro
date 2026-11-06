@@ -1,32 +1,10 @@
 import { NavLink } from "react-router-dom";
-import {
-  LayoutDashboard,
-  ArrowDownCircle,
-  ArrowUpCircle,
-  CalendarDays,
-  Building2,
-  Tag,
-  BarChart3,
-  TrendingDown,
-  Plus,
-  LineChart,
-} from "lucide-react";
+import { TrendingDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLancamentos } from "../../hooks/useLancamentos";
 import { useEmpresas } from "../../hooks/useEmpresas";
 import type { Lancamento, Empresa } from "../../types";
-
-interface NavItem {
-  to: string;
-  label: string;
-  icon: React.ReactNode;
-  badgeCount?: number;
-}
-
-interface NavGroup {
-  label: string;
-  items: NavItem[];
-}
+import { buildNavGroups } from "./navConfig";
 
 interface SidebarProps {
   isOpen?: boolean;
@@ -40,37 +18,7 @@ export default function Sidebar({ isOpen = false, onNavigate }: SidebarProps) {
   const vencidosPagar = lancamentos.filter((l: Lancamento) => l.tipo === "debito" && l.status === "vencido").length;
   const vencidosReceber = lancamentos.filter((l: Lancamento) => l.tipo === "credito" && l.status === "vencido").length;
 
-  const groups: NavGroup[] = [
-    {
-      label: "Dashboard",
-      items: [
-        { to: "/dashboard", label: "Dashboard", icon: <LayoutDashboard size={16} /> },
-        { to: "/analise", label: "Analise Gerencial", icon: <LineChart size={16} /> },
-      ],
-    },
-    {
-      label: "Lancamentos",
-      items: [
-        { to: "/lancamentos", label: "Novo Lancamento", icon: <Plus size={16} /> },
-        { to: "/pagar", label: "Contas a Pagar", icon: <ArrowDownCircle size={16} />, badgeCount: vencidosPagar },
-        { to: "/receber", label: "Contas a Receber", icon: <ArrowUpCircle size={16} />, badgeCount: vencidosReceber },
-        { to: "/agendamento", label: "Agendamento", icon: <CalendarDays size={16} /> },
-      ],
-    },
-    {
-      label: "Gestao",
-      items: [
-        { to: "/empresas", label: "Empresas", icon: <Building2 size={16} /> },
-        { to: "/categorias", label: "Categorias", icon: <Tag size={16} /> },
-      ],
-    },
-    {
-      label: "Relatorios",
-      items: [
-        { to: "/relatorios", label: "Relatorios", icon: <BarChart3 size={16} /> },
-      ],
-    },
-  ];
+  const groups = buildNavGroups(vencidosPagar, vencidosReceber);
 
   return (
     <aside

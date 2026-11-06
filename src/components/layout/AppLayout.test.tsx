@@ -105,4 +105,24 @@ describe('AppLayout - navegacao responsiva', () => {
     renderLayout();
     expect(screen.getByText('Conteudo do Dashboard')).toBeInTheDocument();
   });
+
+  it('renderiza a barra de navegacao inferior (mobile), oculta no desktop', () => {
+    renderLayout();
+    const nav = screen.getByRole('navigation', { name: /navegacao principal/i });
+    expect(nav).toBeInTheDocument();
+    expect(nav).toHaveClass('md:hidden');
+  });
+
+  it('abre o menu completo (drawer) ao clicar em "Menu" na barra inferior', () => {
+    renderLayout();
+    fireEvent.click(screen.getByRole('button', { name: /abrir menu completo/i }));
+    const aside = screen.getByText('Finance Control').closest('aside');
+    expect(aside).toHaveClass('translate-x-0');
+  });
+
+  it('reserva espaco inferior no conteudo para a barra nao cobrir botoes/formularios', () => {
+    renderLayout();
+    const main = screen.getByText('Conteudo do Dashboard').closest('main');
+    expect(main).toHaveClass('pb-bottom-nav');
+  });
 });

@@ -500,7 +500,7 @@ export default function Relatorios() {
       {/* A. Visão Geral — regime de caixa (realizado) */}
       <div>
         <h2 className="text-sm font-semibold text-foreground mb-2">Visão Geral — Regime de Caixa (Realizado)</h2>
-        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           <KpiCard title="Receitas Realizadas" value={receitasRealizadas!.total} icon={<TrendingUp size={18} />} colorVariant="green" />
           <KpiCard title="Despesas Realizadas" value={despesasRealizadas!.total} icon={<TrendingDown size={18} />} colorVariant="red" />
           <KpiCard
@@ -520,7 +520,7 @@ export default function Relatorios() {
       {/* B. Compromissos Financeiros — previsão (vencimento) */}
       <div>
         <h2 className="text-sm font-semibold text-foreground mb-2">Compromissos Financeiros — Previsão (Vencimento)</h2>
-        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           <KpiCard title="Contas a Receber" value={receitasPrevistas!.total.total} icon={<Clock size={18} />} colorVariant="blue" />
           <KpiCard title="Contas a Pagar" value={despesasPrevistas!.total.total} icon={<Clock size={18} />} colorVariant="amber" />
           <KpiCard title="Recebíveis Vencidos" value={receitasPrevistas!.vencidasEmAberto.total} icon={<AlertTriangle size={18} />} colorVariant="red" />

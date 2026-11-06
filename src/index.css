@@ -40,3 +40,16 @@
   * { @apply border-border; }
   body { @apply bg-background text-foreground antialiased; font-family: 'Inter', system-ui, sans-serif; }
 }
+
+@layer utilities {
+  /* Espaco reservado para a barra de navegacao inferior (mobile) + safe-area do dispositivo. */
+  .pb-bottom-nav {
+    padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
+  }
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .safe-top {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+}

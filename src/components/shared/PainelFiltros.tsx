@@ -1,4 +1,7 @@
 import type { ReactNode } from "react";
+import { useState } from "react";
+import { ChevronDown, SlidersHorizontal } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Button } from "../ui/Button";
 import { STATUS_LABEL, type FiltrosLancamentos } from "../../hooks/useFiltrosLancamentos";
 import { opcoesPeriodo } from "../../utils/periodo";
@@ -9,8 +12,30 @@ const ctrl =
 
 /** Painel único de filtros combinados e dinâmicos (Contas a Pagar, Contas a Receber, Relatórios). */
 export default function PainelFiltros({ f, acoes }: { f: FiltrosLancamentos; acoes?: ReactNode }) {
+  // No mobile o painel abre recolhido (exceto quando ja ha filtro ativo); no
+  // desktop (md:) permanece sempre visivel, independente deste estado.
+  const [open, setOpen] = useState(f.temFiltro);
+
   return (
     <div className="rounded-xl border bg-card p-4 space-y-3">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        aria-controls="painel-filtros-conteudo"
+        className="md:hidden flex w-full items-center justify-between gap-2 text-sm font-medium text-foreground"
+      >
+        <span className="flex items-center gap-2">
+          <SlidersHorizontal size={16} aria-hidden="true" />
+          Filtros
+          {f.temFiltro && (
+            <span className="text-xs rounded-full bg-primary/10 text-primary px-2 py-0.5">Ativos</span>
+          )}
+        </span>
+        <ChevronDown size={16} aria-hidden="true" className={cn("transition-transform", open && "rotate-180")} />
+      </button>
+
+      <div id="painel-filtros-conteudo" className={cn("space-y-3", !open && "hidden md:block")}>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
         <input className={ctrl} placeholder="Buscar..." value={f.busca} onChange={(e) => f.setBusca(e.target.value)} />
         <select className={ctrl} value={f.empresaFiltro} onChange={(e) => f.setEmpresaFiltro(e.target.value)}>
@@ -90,6 +115,7 @@ export default function PainelFiltros({ f, acoes }: { f: FiltrosLancamentos; aco
           ))}
         </div>
       )}
+      </div>
     </div>
   );
 }

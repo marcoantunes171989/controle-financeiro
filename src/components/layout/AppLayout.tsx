@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
+import BottomNav from './BottomNav';
 import { ToastProvider } from '../ui/Toast';
 
 export default function AppLayout() {
@@ -35,10 +36,11 @@ export default function AppLayout() {
             onCompetenciaChange={setCompetencia}
             onMenuClick={() => setSidebarOpen((v) => !v)}
           />
-          <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-muted/30">
+          <main className="flex-1 overflow-y-auto p-4 pb-bottom-nav md:p-6 md:pb-6 bg-muted/30">
             <Outlet context={{ competencia, setCompetencia }} />
           </main>
         </div>
+        <BottomNav onMenuClick={() => setSidebarOpen((v) => !v)} />
       </div>
     </ToastProvider>
   );
