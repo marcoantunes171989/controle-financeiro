@@ -116,14 +116,14 @@ function PainelTipo({
 
   return (
     <div className="space-y-5">
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,2fr)]">
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,2fr)] min-w-0">
         <Destaque
           rotulo={pagar ? 'A pagar em aberto' : 'A receber em aberto'}
           valor={fmtMoeda(ind.totalAberto)}
           apoio={`${itens.filter(emAberto).length} título(s) pendentes ou vencidos`}
           cor={cor}
         />
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 min-w-0">
           <Indicador
             titulo="Vencido"
             valor={fmtMoeda(ind.totalVencido)}
@@ -272,14 +272,14 @@ export default function AnaliseGerencial() {
         </TabsList>
 
         <TabsContent value="geral" className="mt-4 space-y-5">
-          <div className="grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,2fr)]">
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,2fr)] min-w-0">
             <Destaque
               rotulo="Posição líquida em aberto"
               valor={fmtMoeda(posicao)}
               apoio={`${fmtMoeda(indReceber.totalAberto)} a receber − ${fmtMoeda(indPagar.totalAberto)} a pagar`}
               cor={posicao >= 0 ? COR_RECEBER : COR_PAGAR}
             />
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 min-w-0">
               <Indicador titulo="A receber em aberto" valor={fmtMoeda(indReceber.totalAberto)} dica={`Vencido: ${fmtMoeda(indReceber.totalVencido)}`} />
               <Indicador titulo="A pagar em aberto" valor={fmtMoeda(indPagar.totalAberto)} dica={`Vencido: ${fmtMoeda(indPagar.totalVencido)}`} />
               <Indicador

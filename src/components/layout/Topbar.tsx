@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "../ui/DropdownMenu";
 import { useAuth } from "../../contexts/AuthContext";
+import { TYPOGRAPHY } from "../../styles/typography";
 
 const routeTitles: Record<string, string> = {
   "/dashboard": "Dashboard",
@@ -64,7 +65,7 @@ export default function Topbar({ competencia, onCompetenciaChange, onMenuClick }
         >
           <Menu size={20} />
         </button>
-        <h1 className="text-base font-semibold text-foreground truncate">{title}</h1>
+        <h1 className={TYPOGRAPHY.pageTitle}>{title}</h1>
       </div>
 
       <div className="flex items-center gap-2 md:gap-3 shrink-0">

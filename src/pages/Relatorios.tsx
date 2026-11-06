@@ -49,6 +49,7 @@ import Table from "../components/ui/Table";
 import { Button } from "../components/ui/Button";
 import type { Lancamento, Empresa, Categoria } from "../types";
 import { fmtMoeda, fmtData, fmtMesAno } from "../utils/format";
+import { TYPOGRAPHY } from "../styles/typography";
 import {
   aplicarFiltros,
   calcularReceitasRealizadas,
@@ -218,7 +219,7 @@ function IndicadorIndisponivel({ title, icon, motivo }: { title: string; icon: R
     <div className="rounded-xl border border-l-4 border-slate-300 bg-slate-50 p-5 flex items-start gap-4">
       <div className="p-2.5 rounded-lg bg-slate-100 text-slate-500">{icon}</div>
       <div className="flex-1 min-w-0">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{title}</p>
+        <p className={TYPOGRAPHY.label}>{title}</p>
         <p className="text-lg font-semibold text-slate-500 mt-1">Indisponível</p>
         <p className="text-xs text-slate-400 mt-1">{motivo}</p>
       </div>

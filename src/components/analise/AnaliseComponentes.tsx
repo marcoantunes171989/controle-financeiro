@@ -15,6 +15,7 @@ import {
 import { BarChart3, Table2, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { fmtMoeda, fmtPercentual } from '../../utils/format';
+import { TYPOGRAPHY } from '../../styles/typography';
 import type { FaixaAging, ItemRanking, PontoMensal, SemanaProjecao } from '../../utils/analise';
 
 /** Paleta categórica validada (scripts/validate_palette.js): azul = receber, laranja = pagar. */
@@ -63,10 +64,10 @@ export function ChartCard({
     </button>
   );
   return (
-    <section className={cn('rounded-xl border bg-card shadow-sm', className)}>
+    <section className={cn('rounded-xl border bg-card shadow-sm min-w-0', className)}>
       <header className="flex items-start justify-between gap-3 px-5 pt-4">
         <div className="min-w-0">
-          <h3 className="text-sm font-semibold">{titulo}</h3>
+          <h3 className={TYPOGRAPHY.cardTitle}>{titulo}</h3>
           {subtitulo && <p className="text-xs text-muted-foreground mt-0.5">{subtitulo}</p>}
         </div>
         <div className="flex gap-0.5 shrink-0">
@@ -313,9 +314,9 @@ export function RankingBars({
         dados.length ? (
           <ul className="space-y-3">
             {dados.map((d) => (
-              <li key={d.id}>
+              <li key={d.id} className="min-w-0">
                 <div className="flex items-baseline justify-between gap-3 text-xs mb-1">
-                  <span className="truncate font-medium" title={d.nome}>
+                  <span className="truncate min-w-0 font-medium" title={d.nome}>
                     {d.nome}
                   </span>
                   <span className="tabular-nums text-muted-foreground shrink-0">
@@ -364,13 +365,13 @@ export function Indicador({
   critico?: boolean;
 }) {
   return (
-    <div className="rounded-xl border bg-card p-4 shadow-sm">
-      <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">{titulo}</p>
+    <div className="rounded-xl border bg-card p-4 shadow-sm min-w-0">
+      <p className={TYPOGRAPHY.label}>{titulo}</p>
       <p
-        className="mt-1.5 text-xl font-semibold tabular-nums flex items-center gap-1.5"
+        className={cn(TYPOGRAPHY.valueMd, 'mt-1.5 flex items-center gap-1.5')}
         style={critico ? { color: COR_CRITICO } : undefined}
       >
-        {critico && <AlertTriangle size={15} aria-label="Atenção" />}
+        {critico && <AlertTriangle size={15} className="shrink-0" aria-label="Atenção" />}
         {valor}
       </p>
       {dica && <p className="mt-1 text-[11px] text-muted-foreground leading-snug">{dica}</p>}
@@ -381,12 +382,12 @@ export function Indicador({
 /** Número de destaque da visão (um por aba). */
 export function Destaque({ rotulo, valor, apoio, cor }: { rotulo: string; valor: string; apoio: string; cor: string }) {
   return (
-    <div className="rounded-xl border bg-card p-5 shadow-sm flex flex-col justify-center">
-      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-2">
-        <span className="inline-block w-2.5 h-2.5 rounded-sm" style={{ background: cor }} />
+    <div className="rounded-xl border bg-card p-5 shadow-sm flex flex-col justify-center min-w-0">
+      <p className={cn(TYPOGRAPHY.label, 'flex items-center gap-2')}>
+        <span className="inline-block w-2.5 h-2.5 rounded-sm shrink-0" style={{ background: cor }} />
         {rotulo}
       </p>
-      <p className="mt-2 text-5xl font-semibold tabular-nums tracking-tight">{valor}</p>
+      <p className={cn(TYPOGRAPHY.valueLg, 'mt-2')}>{valor}</p>
       <p className="mt-2 text-xs text-muted-foreground">{apoio}</p>
     </div>
   );

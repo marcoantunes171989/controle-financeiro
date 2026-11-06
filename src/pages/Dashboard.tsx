@@ -24,6 +24,8 @@ import Select from '../components/ui/Select';
 import Spinner from '../components/ui/Spinner';
 import type { Lancamento, CategoriaTotais, Empresa, Categoria } from '../types';
 import { fmtMesAno } from '../utils/format';
+import { TYPOGRAPHY } from '../styles/typography';
+import { cn } from '@/lib/utils';
 import {
   aplicarFiltros,
   dataDentroDoPeriodo,
@@ -311,7 +313,7 @@ function IndicadorIndisponivel({ title, icon, motivo }: { title: string; icon: R
     <div className="rounded-xl border border-l-4 border-slate-300 bg-slate-50 p-4 sm:p-5 flex flex-col gap-2">
       <div className="flex items-center gap-2 sm:gap-3">
         <div className="p-2 sm:p-2.5 rounded-lg bg-slate-100 text-slate-500 shrink-0">{icon}</div>
-        <p className="flex-1 min-w-0 text-xs font-medium text-muted-foreground uppercase tracking-wide break-words">{title}</p>
+        <p className={cn('flex-1 min-w-0 break-words', TYPOGRAPHY.label)}>{title}</p>
       </div>
       <p className="text-lg font-semibold text-slate-500">Indisponível</p>
       <p className="text-xs text-slate-400 break-words">{motivo}</p>

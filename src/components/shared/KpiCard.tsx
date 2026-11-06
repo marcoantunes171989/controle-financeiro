@@ -1,6 +1,7 @@
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { fmtMoeda, fmtPercentual } from "../../utils/format";
+import { TYPOGRAPHY } from "../../styles/typography";
 
 interface Trend {
   value: number;
@@ -47,9 +48,9 @@ export default function KpiCard({
             {icon}
           </div>
         )}
-        <p className="flex-1 min-w-0 text-xs font-medium text-muted-foreground uppercase tracking-wide break-words">{title}</p>
+        <p className={cn('flex-1 min-w-0 break-words', TYPOGRAPHY.label)}>{title}</p>
       </div>
-      <p className="text-xl sm:text-2xl font-semibold text-foreground break-words w-full">{formatted}</p>
+      <p className={cn(TYPOGRAPHY.valueMd, 'text-foreground w-full')}>{formatted}</p>
       {trend && (
         <div className={cn("flex items-center gap-1 text-xs", trend.value >= 0 ? "text-emerald-600" : "text-destructive")}>
           {trend.value >= 0 ? <TrendingUp size={12} className="shrink-0" /> : <TrendingDown size={12} className="shrink-0" />}
