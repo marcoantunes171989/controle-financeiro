@@ -126,3 +126,45 @@ describe('AppLayout - navegacao responsiva', () => {
     expect(main).toHaveClass('pb-bottom-nav');
   });
 });
+
+describe('AppLayout - sidebar recolhivel (desktop)', () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+  });
+
+  it('comeca expandida por padrao (sem preferencia salva)', () => {
+    renderLayout();
+    const aside = screen.getByText('Finance Control').closest('aside');
+    expect(aside).toHaveClass('md:w-60');
+    expect(screen.getByRole('button', { name: /recolher menu de navegacao/i })).toBeInTheDocument();
+  });
+
+  it('recolhe a sidebar e persiste a preferencia em localStorage', () => {
+    renderLayout();
+    fireEvent.click(screen.getByRole('button', { name: /recolher menu de navegacao/i }));
+
+    const aside = screen.getByText('Finance Control').closest('aside');
+    expect(aside).toHaveClass('md:w-16');
+    expect(window.localStorage.getItem('cf:sidebar-collapsed')).toBe('1');
+  });
+
+  it('restaura o estado recolhido salvo ao montar novamente', () => {
+    window.localStorage.setItem('cf:sidebar-collapsed', '1');
+    renderLayout();
+
+    const aside = screen.getByText('Finance Control').closest('aside');
+    expect(aside).toHaveClass('md:w-16');
+    expect(screen.getByRole('button', { name: /expandir menu de navegacao/i })).toBeInTheDocument();
+  });
+
+  it('mantem a rota atual ao recolher/expandir a sidebar', () => {
+    renderLayout();
+    fireEvent.click(screen.getByRole('button', { name: /recolher menu de navegacao/i }));
+    expect(screen.getByText('Conteudo do Dashboard')).toBeInTheDocument();
+  });
+
+  it('nao duplica controles de menu: o botao de recolher so existe na Sidebar, nao na BottomNav', () => {
+    renderLayout();
+    expect(screen.getAllByRole('button', { name: /recolher menu de navegacao/i })).toHaveLength(1);
+  });
+});

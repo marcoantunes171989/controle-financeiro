@@ -80,12 +80,34 @@ export default function Table<T extends { id?: string }>({
                 key={col.key}
                 style={{ width: col.width }}
                 onClick={() => handleSort(col)}
+                onKeyDown={
+                  col.sortable
+                    ? (e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          handleSort(col);
+                        }
+                      }
+                    : undefined
+                }
+                role={col.sortable ? "button" : undefined}
+                tabIndex={col.sortable ? 0 : undefined}
+                aria-sort={
+                  col.sortable
+                    ? sortKey === col.key
+                      ? sortDir === "asc"
+                        ? "ascending"
+                        : "descending"
+                      : "none"
+                    : undefined
+                }
                 className={cn(
                   "px-4 py-3 font-medium text-muted-foreground whitespace-nowrap select-none",
                   col.align === "center" && "text-center",
                   col.align === "right" && "text-right",
                   (!col.align || col.align === "left") && "text-left",
-                  col.sortable && "cursor-pointer hover:text-foreground transition-colors"
+                  col.sortable &&
+                    "cursor-pointer hover:text-foreground transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                 )}
               >
                 <span className={cn("inline-flex items-center gap-1", col.align === "right" && "flex-row-reverse")}>

@@ -6,9 +6,20 @@ import Topbar from './Topbar';
 import BottomNav from './BottomNav';
 import { ToastProvider } from '../ui/Toast';
 
+const SIDEBAR_COLLAPSED_KEY = 'cf:sidebar-collapsed';
+
+function readSidebarCollapsedPreference(): boolean {
+  try {
+    return window.localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
 export default function AppLayout() {
   const [competencia, setCompetencia] = useState(format(new Date(), 'yyyy-MM'));
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(readSidebarCollapsedPreference);
 
   useEffect(() => {
     if (!sidebarOpen) return;
@@ -19,10 +30,27 @@ export default function AppLayout() {
     return () => document.removeEventListener('keydown', onKeyDown);
   }, [sidebarOpen]);
 
+  const toggleSidebarCollapsed = () => {
+    setSidebarCollapsed((prev) => {
+      const next = !prev;
+      try {
+        window.localStorage.setItem(SIDEBAR_COLLAPSED_KEY, next ? '1' : '0');
+      } catch {
+        // preferencia visual apenas; se o storage falhar, mantemos o estado em memoria
+      }
+      return next;
+    });
+  };
+
   return (
     <ToastProvider>
       <div className="flex h-screen overflow-hidden bg-background">
-        <Sidebar isOpen={sidebarOpen} onNavigate={() => setSidebarOpen(false)} />
+        <Sidebar
+          isOpen={sidebarOpen}
+          onNavigate={() => setSidebarOpen(false)}
+          collapsed={sidebarCollapsed}
+          onToggleCollapsed={toggleSidebarCollapsed}
+        />
         {sidebarOpen && (
           <div
             className="fixed inset-0 z-40 bg-black/50 md:hidden"
