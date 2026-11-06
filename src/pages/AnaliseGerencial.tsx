@@ -265,10 +265,10 @@ export default function AnaliseGerencial() {
       </div>
 
       <Tabs defaultValue="geral">
-        <TabsList>
-          <TabsTrigger value="geral"><Layers size={14} className="mr-1.5" />Visão geral</TabsTrigger>
-          <TabsTrigger value="pagar"><ArrowDownCircle size={14} className="mr-1.5" />Contas a pagar</TabsTrigger>
-          <TabsTrigger value="receber"><ArrowUpCircle size={14} className="mr-1.5" />Contas a receber</TabsTrigger>
+        <TabsList className="w-full max-w-full justify-start overflow-x-auto">
+          <TabsTrigger value="geral" className="shrink-0"><Layers size={14} className="mr-1.5" />Visão geral</TabsTrigger>
+          <TabsTrigger value="pagar" className="shrink-0"><ArrowDownCircle size={14} className="mr-1.5" />Contas a pagar</TabsTrigger>
+          <TabsTrigger value="receber" className="shrink-0"><ArrowUpCircle size={14} className="mr-1.5" />Contas a receber</TabsTrigger>
         </TabsList>
 
         <TabsContent value="geral" className="mt-4 space-y-5">
