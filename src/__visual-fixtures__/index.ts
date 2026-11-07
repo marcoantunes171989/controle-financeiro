@@ -5,3 +5,4 @@ export * from './usuario';
 export * from './empresas';
 export * from './categorias';
 export * from './lancamentos';
+export * from './anexos';

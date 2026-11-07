@@ -54,7 +54,9 @@ describe('client.visual-mock — Microgate 09-C', () => {
   });
 
   test('10. filtro por empresa (eq) não lança erro e devolve um resultado determinístico', async () => {
-    const consulta = supabase.from('lancamentos').select('*') as { eq: (c: string, v: unknown) => Promise<{ data: unknown[]; error: null }> };
+    const consulta = supabase.from('lancamentos').select('*') as unknown as {
+      eq: (c: string, v: unknown) => Promise<{ data: unknown[]; error: null }>;
+    };
     const { data, error } = await consulta.eq('empresa_id', empresasFixture[0].id);
     expect(error).toBeNull();
     expect(Array.isArray(data)).toBe(true);

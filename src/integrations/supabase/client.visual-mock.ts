@@ -20,6 +20,7 @@ import {
   empresasFixture,
   categoriasFixture,
   lancamentosFixture,
+  anexosFixture,
 } from '../../__visual-fixtures__';
 
 type LinhaGenerica = Record<string, unknown>;
@@ -36,6 +37,7 @@ const TABELAS_SUPORTADAS: Record<string, LinhaGenerica[]> = {
   empresas: empresasFixture as unknown as LinhaGenerica[],
   categorias: categoriasFixture as unknown as LinhaGenerica[],
   lancamentos: lancamentosFixture as unknown as LinhaGenerica[],
+  anexos: anexosFixture as unknown as LinhaGenerica[],
 };
 
 function ordenarPor(linhas: LinhaGenerica[], coluna: string, ascending: boolean): LinhaGenerica[] {
@@ -50,23 +52,33 @@ function ordenarPor(linhas: LinhaGenerica[], coluna: string, ascending: boolean)
   return copia;
 }
 
+// Builder encadeável mínimo: cada filtro/ordenação retorna um objeto com os
+// mesmos métodos (eq/order) mais `then`, para suportar qualquer ordem de
+// encadeamento usada pelos hooks reais (ex.: select().eq().order()).
+function criarQueryBuilder(linhas: LinhaGenerica[]) {
+  const builder = {
+    eq(coluna: string, valor: unknown) {
+      return criarQueryBuilder(linhas.filter((l) => l[coluna] === valor));
+    },
+    order(coluna: string, opcoes?: { ascending?: boolean }) {
+      return criarQueryBuilder(ordenarPor(linhas, coluna, opcoes?.ascending ?? true));
+    },
+    then(
+      onFulfilled: (value: { data: LinhaGenerica[]; error: null }) => unknown,
+      onRejected?: (reason: unknown) => unknown,
+    ) {
+      return Promise.resolve({ data: linhas, error: null }).then(onFulfilled, onRejected);
+    },
+  };
+  return builder;
+}
+
 function criarConsulta(nomeTabela: string) {
   const linhasDaTabela = TABELAS_SUPORTADAS[nomeTabela];
 
   return {
     select(_colunas: string = '*') {
-      return {
-        order(coluna: string, opcoes?: { ascending?: boolean }) {
-          const ordenado = ordenarPor(linhasDaTabela, coluna, opcoes?.ascending ?? true);
-          return Promise.resolve({ data: ordenado, error: null });
-        },
-        eq(_coluna: string, _valor: unknown) {
-          return Promise.resolve({ data: linhasDaTabela, error: null });
-        },
-        then(onFulfilled: (value: { data: LinhaGenerica[]; error: null }) => unknown) {
-          return Promise.resolve({ data: linhasDaTabela, error: null }).then(onFulfilled);
-        },
-      };
+      return criarQueryBuilder(linhasDaTabela);
     },
     insert() {
       return falhaOperacaoNaoSuportada(`from('${nomeTabela}').insert(...)`);
