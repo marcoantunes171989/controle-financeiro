@@ -16,7 +16,7 @@ Sistema de controle financeiro multi-empresa com lançamentos, contas a pagar/re
 
 ## Repositórios e Serviços
 - **GitHub:** https://github.com/marcoantunes171989/controle-financeiro (branch `master`)
-- **Vercel:** https://controle-financeiro-iota-kohl.vercel.app — deploy automático a cada push para `master`
+- **Vercel:** https://finance-control-kappa-seven.vercel.app — deploy automático a cada push para `master`
 - **Supabase:** Projeto `luuqslqqncjsvekjkpnd` — credenciais em `.env` (não commitado)
 
 ## Variáveis de Ambiente
