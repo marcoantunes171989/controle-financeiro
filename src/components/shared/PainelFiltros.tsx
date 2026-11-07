@@ -23,7 +23,7 @@ export default function PainelFiltros({ f, acoes }: { f: FiltrosLancamentos; aco
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-controls="painel-filtros-conteudo"
-        className="md:hidden flex w-full items-center justify-between gap-2 text-sm font-medium text-foreground"
+        className="md:hidden flex w-full min-h-[44px] items-center justify-between gap-2 text-sm font-medium text-foreground"
       >
         <span className="flex items-center gap-2">
           <SlidersHorizontal size={16} aria-hidden="true" />

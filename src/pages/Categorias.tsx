@@ -85,10 +85,10 @@ function CategoriaCard({ cat, lancamentos, onEdit, onDelete }: {
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold truncate">{cat.nome}</p>
-        <div className="flex items-center gap-3 mt-0.5">
-          <span className="text-xs text-muted-foreground">{count} lancamento{count !== 1 ? "s" : ""}</span>
+        <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+          <span className="text-xs text-muted-foreground whitespace-nowrap">{count} lancamento{count !== 1 ? "s" : ""}</span>
           {total > 0 && (
-            <span className="text-xs font-medium" style={{ color: cor }}>{fmtMoeda(total)} este mes</span>
+            <span className="text-xs font-medium whitespace-nowrap" style={{ color: cor }}>{fmtMoeda(total)} este mes</span>
           )}
         </div>
       </div>
@@ -189,7 +189,7 @@ export default function Categorias() {
       </div>
 
       <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
-        <div className="flex items-center justify-between px-4 pt-4 pb-0">
+        <div className="flex items-center justify-between gap-2 flex-wrap px-4 pt-4 pb-3 sm:pb-0">
           <Tabs value={aba} onValueChange={(v) => setAba(v as TipoLancamento)}>
             <TabsList>
               <TabsTrigger value="debito">
@@ -202,7 +202,7 @@ export default function Categorias() {
               </TabsTrigger>
             </TabsList>
           </Tabs>
-          <Button size="sm" onClick={() => abrirNova(aba)}>
+          <Button size="sm" onClick={() => abrirNova(aba)} className="shrink-0">
             <Plus size={13} />
             Nova categoria
           </Button>
