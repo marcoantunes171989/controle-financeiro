@@ -26,3 +26,10 @@ yarn-error.log*
 .vercel
 
 .vercel
+
+# playwright responsive audit artifacts
+/test-results
+/tests/responsive/__screenshots__
+/tests/responsive/__report__
+/playwright-report
+/blob-report
