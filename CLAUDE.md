@@ -59,8 +59,9 @@ npm run build  # build de produção
 ```
 
 ## Deploy
-Push para `master` → Vercel detecta e faz deploy automático.
-O hook Stop do Claude Code já faz isso automaticamente ao final de cada sessão.
+Commits, push e deploy exigem autorização explícita do usuário em cada ocasião.
+Não executar `git add -A`, commit ou push automaticamente, nem publicar alterações ao encerrar sessões.
+O push para `master` pode disparar deploy automático na Vercel — por isso só deve ser feito quando autorizado.
 
 ## Convenções
 - Nomes de arquivos: PascalCase para componentes, camelCase para utils/hooks
