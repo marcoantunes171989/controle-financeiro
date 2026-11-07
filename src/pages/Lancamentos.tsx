@@ -226,7 +226,7 @@ export default function Lancamentos() {
           <div className="border-t border-border/60" />
 
           {/* ── Empresa + Categoria ── */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <FieldLabel icon={Building2} required>Empresa</FieldLabel>
               <select className={cn(fieldBase, errors.empresaId && "border-destructive")} {...register("empresaId")}>
@@ -293,7 +293,7 @@ export default function Lancamentos() {
           </div>
 
           {/* ── Datas ── */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <FieldLabel icon={Calendar}>Data de Emissão</FieldLabel>
               <input type="date" className={cn(fieldBase, errors.dataEmissao && "border-destructive")} {...register("dataEmissao")} />
@@ -321,7 +321,7 @@ export default function Lancamentos() {
           {/* ── Tipo de pagamento ── */}
           <div>
             <FieldLabel icon={SplitSquareHorizontal}>Tipo de pagamento</FieldLabel>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
               {(["avista", "fixo", "parcelas"] as const).map((tr) => {
                 const labels = { avista: "À Vista", fixo: "Agendamento", parcelas: "Parcelado" };
                 const icons = { avista: DollarSign, fixo: Repeat, parcelas: SplitSquareHorizontal };
@@ -361,12 +361,12 @@ export default function Lancamentos() {
                 <FieldError message={errors.numeroParcelas?.message} />
               </div>
               {valorNum > 0 && numeroParcelas >= 2 && (
-                <div className="flex items-center justify-between bg-background border border-border rounded-lg px-4 py-3">
+                <div className="flex flex-wrap items-center justify-between gap-3 bg-background border border-border rounded-lg px-4 py-3">
                   <div className="text-center">
                     <p className="text-xs text-muted-foreground mb-0.5">Por parcela</p>
                     <p className="text-sm font-bold text-foreground">{fmtMoeda(calcularParcelasValor(valorNum, numeroParcelas))}</p>
                   </div>
-                  <div className="h-8 w-px bg-border" />
+                  <div className="h-8 w-px bg-border hidden sm:block" />
                   <div className="text-center">
                     <p className="text-xs text-muted-foreground mb-0.5">Total ({numeroParcelas}x)</p>
                     <p className="text-sm font-bold text-foreground">{fmtMoeda(calcularTotalParcelado(valorNum, numeroParcelas))}</p>
@@ -378,7 +378,7 @@ export default function Lancamentos() {
 
           {/* ── Agendamento (condicional) ── */}
           {tipoRecorrencia === "fixo" && (
-            <div className="p-4 bg-muted/60 rounded-xl border border-border grid grid-cols-2 gap-3">
+            <div className="p-4 bg-muted/60 rounded-xl border border-border grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <FieldLabel icon={Repeat} required>Recorrência</FieldLabel>
                 <select
@@ -439,7 +439,7 @@ export default function Lancamentos() {
                 <FieldError message={errors.quantidadeMeses?.message} />
               </div>
               {(totalTitulos > 0 || watch("dataVencimento")) && (
-                <p className="col-span-2 text-xs text-muted-foreground">
+                <p className="col-span-1 sm:col-span-2 text-xs text-muted-foreground">
                   {watch("dataVencimento") && <>Primeiro vencimento: <strong className="text-foreground">{fmtData(watch("dataVencimento"))}</strong>. </>}
                   {totalTitulos > 0 && <>Serão gerados <strong className="text-foreground">{totalTitulos}</strong> título(s), editáveis individualmente depois.</>}
                 </p>
@@ -453,7 +453,7 @@ export default function Lancamentos() {
           {/* ── Anexos ── */}
           <div>
             <FieldLabel icon={Paperclip}>Anexos</FieldLabel>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <DropZone key={`boleto-${dropKey}`} label="Boleto / NF" onFilesAccepted={(files) => setArquivos((prev) => [...prev, ...files])} hint="PDF, PNG, JPG" />
               <DropZone key={`comp-${dropKey}`} label="Comprovante" onFilesAccepted={(files) => setArquivos((prev) => [...prev, ...files])} hint="PDF, PNG, JPG" />
             </div>

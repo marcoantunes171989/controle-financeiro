@@ -159,15 +159,17 @@ export default function Empresas() {
                   <div className="flex gap-1">
                     <button
                       onClick={(e) => { e.stopPropagation(); abrirEditar(empresa); }}
-                      className="p-1 rounded text-muted-foreground hover:bg-accent"
+                      aria-label="Editar empresa"
+                      className="p-2.5 -m-1 rounded text-muted-foreground hover:bg-accent"
                     >
-                      <Pencil size={12} />
+                      <Pencil size={14} />
                     </button>
                     <button
                       onClick={(e) => { e.stopPropagation(); updateEmpresa(empresa.id, { ativo: !empresa.ativo }); }}
-                      className={`p-1 rounded ${empresa.ativo ? "text-muted-foreground hover:bg-accent" : "text-emerald-500 hover:bg-emerald-50"}`}
+                      aria-label={empresa.ativo ? "Desativar empresa" : "Ativar empresa"}
+                      className={`p-2.5 -m-1 rounded ${empresa.ativo ? "text-muted-foreground hover:bg-accent" : "text-emerald-500 hover:bg-emerald-50"}`}
                     >
-                      <Power size={12} />
+                      <Power size={14} />
                     </button>
                   </div>
                 </div>
@@ -234,7 +236,7 @@ export default function Empresas() {
             <DialogTitle>{editando ? "Editar empresa" : "Nova empresa"}</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Input label="Razao Social" error={errors.razaoSocial?.message} {...register("razaoSocial")} />
               <Input label="Nome Fantasia" error={errors.nomeFantasia?.message} {...register("nomeFantasia")} />
             </div>
@@ -249,7 +251,7 @@ export default function Empresas() {
                 setValue("cnpj", masked, { shouldValidate: false });
               }}
             />
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Input
                 label="Telefone"
                 placeholder="(00) 00000-0000"
@@ -263,7 +265,7 @@ export default function Empresas() {
               />
               <Input label="E-mail" placeholder="email@exemplo.com" error={errors.email?.message} {...register("email")} />
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Input label="Cidade" error={errors.cidade?.message} {...register("cidade")} />
               <Input label="Estado (UF)" maxLength={2} error={errors.estado?.message} {...register("estado")} />
             </div>

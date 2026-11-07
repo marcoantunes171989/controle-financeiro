@@ -279,7 +279,7 @@ export default function LancamentoDetalheModal({ lancamento, open, onClose }: Pr
           </DialogHeader>
 
           <div className="space-y-5">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <label className="text-sm font-medium leading-none text-foreground">Empresa</label>
                 <select className={cn(selectClass, errors.empresaId && "border-destructive")} {...register("empresaId")}>
@@ -304,7 +304,7 @@ export default function LancamentoDetalheModal({ lancamento, open, onClose }: Pr
 
             <Input label="Descricao" error={errors.descricao?.message} {...register("descricao")} />
 
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="space-y-1.5">
                 <label className="text-sm font-medium leading-none text-foreground">Valor</label>
                 <input
@@ -352,7 +352,7 @@ export default function LancamentoDetalheModal({ lancamento, open, onClose }: Pr
             )}
 
             {tipoRecorrencia === "fixo" && (
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium leading-none text-foreground">Recorrencia</label>
                   <select className={selectClass} {...register("recorrencia")}>
