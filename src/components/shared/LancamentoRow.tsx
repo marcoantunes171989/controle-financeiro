@@ -48,41 +48,45 @@ export default function LancamentoRow({ lancamento: l, onEdit, onDelete, onBaixa
 
         <StatusBadge status={l.status} />
 
-        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 transition-opacity shrink-0">
           {onBaixar && l.status === 'pendente' && (
             <button
               onClick={() => onBaixar(l)}
-              className="p-1 rounded text-emerald-600 hover:bg-emerald-50"
+              className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded text-emerald-600 hover:bg-emerald-50"
               title="Dar baixa"
+              aria-label="Dar baixa"
             >
-              <CheckCircle size={14} />
+              <CheckCircle size={16} />
             </button>
           )}
           {onVerAnexos && (
             <button
               onClick={() => onVerAnexos(l)}
-              className="p-1 rounded text-slate-400 hover:bg-slate-100"
+              className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded text-slate-400 hover:bg-slate-100"
               title="Anexos"
+              aria-label="Anexos"
             >
-              <Paperclip size={14} />
+              <Paperclip size={16} />
             </button>
           )}
           {onEdit && (
             <button
               onClick={() => onEdit(l)}
-              className="p-1 rounded text-slate-400 hover:bg-slate-100"
+              className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded text-slate-400 hover:bg-slate-100"
               title="Editar"
+              aria-label="Editar"
             >
-              <Pencil size={14} />
+              <Pencil size={16} />
             </button>
           )}
           {onDelete && (
             <button
               onClick={() => setConfirmOpen(true)}
-              className="p-1 rounded text-red-400 hover:bg-red-50"
+              className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded text-red-400 hover:bg-red-50"
               title="Excluir"
+              aria-label="Excluir"
             >
-              <Trash2 size={14} />
+              <Trash2 size={16} />
             </button>
           )}
         </div>
