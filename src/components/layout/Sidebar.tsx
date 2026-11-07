@@ -30,10 +30,10 @@ export default function Sidebar({ isOpen = false, onNavigate, collapsed = false,
         isOpen ? "translate-x-0" : "-translate-x-full",
         collapsed ? "md:w-16" : "md:w-60"
       )}
-      style={{ backgroundColor: "hsl(var(--sidebar-background))", color: "hsl(var(--sidebar-foreground))", borderRight: "1px solid hsl(var(--sidebar-border))" }}
+      style={{ backgroundColor: "hsl(var(--sidebar-background))", color: "hsl(var(--sidebar-foreground))", borderRight: "1px solid hsl(var(--sidebar-border))", paddingLeft: "env(safe-area-inset-left, 0px)" }}
     >
       {/* Logo */}
-      <div className={cn("flex items-center gap-2.5 px-5 py-5", collapsed && "md:justify-center md:px-0")} style={{ borderBottom: "1px solid hsl(var(--sidebar-border))" }}>
+      <div className={cn("flex items-center gap-2.5 px-5 pb-5 pt-[calc(1.25rem+env(safe-area-inset-top))]", collapsed && "md:justify-center md:px-0")} style={{ borderBottom: "1px solid hsl(var(--sidebar-border))" }}>
         <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: "hsl(var(--sidebar-primary))" }}>
           <TrendingDown size={16} style={{ color: "hsl(var(--sidebar-primary-foreground))" }} />
         </div>
@@ -116,7 +116,7 @@ export default function Sidebar({ isOpen = false, onNavigate, collapsed = false,
       </nav>
 
       {/* Empresas ativas */}
-      <div className={cn("p-4", collapsed && "md:hidden")} style={{ borderTop: "1px solid hsl(var(--sidebar-border))" }}>
+      <div className={cn("px-4 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))]", collapsed && "md:hidden")} style={{ borderTop: "1px solid hsl(var(--sidebar-border))" }}>
         <p className="text-xs mb-2 opacity-50" style={{ color: "hsl(var(--sidebar-foreground))" }}>Empresas ativas</p>
         <div className="space-y-1">
           {empresas.filter((e: Empresa) => e.ativo).slice(0, 3).map((e: Empresa) => (

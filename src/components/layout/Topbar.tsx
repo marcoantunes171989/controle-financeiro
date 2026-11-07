@@ -55,13 +55,13 @@ export default function Topbar({ competencia, onCompetenciaChange, onMenuClick }
   const initials = user?.email ? user.email.slice(0, 2).toUpperCase() : "FC";
 
   return (
-    <header className="h-14 border-b border-border bg-background flex items-center justify-between gap-2 px-3 md:px-6 shrink-0">
+    <header className="min-h-14 pt-[env(safe-area-inset-top)] border-b border-border bg-background flex items-center justify-between gap-2 px-3 md:px-6 shrink-0">
       <div className="flex items-center gap-2 min-w-0">
         <button
           type="button"
           onClick={onMenuClick}
           aria-label="Abrir menu de navegacao"
-          className="md:hidden p-1.5 -ml-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors shrink-0"
+          className="md:hidden -ml-1 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors shrink-0"
         >
           <Menu size={20} />
         </button>
@@ -70,14 +70,22 @@ export default function Topbar({ competencia, onCompetenciaChange, onMenuClick }
 
       <div className="flex items-center gap-2 md:gap-3 shrink-0">
         {/* Competencia selector */}
-        <div className="flex items-center gap-1 bg-muted rounded-lg px-2 py-1">
-          <button onClick={prev} className="p-0.5 text-muted-foreground hover:text-foreground transition-colors">
+        <div className="flex items-center gap-0.5 bg-muted rounded-lg px-1 py-1">
+          <button
+            onClick={prev}
+            aria-label="Mes anterior"
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-background transition-colors"
+          >
             <ChevronLeft size={14} />
           </button>
-          <span className="text-xs font-medium text-foreground w-20 md:w-24 text-center capitalize">
+          <span className="text-xs font-medium text-foreground w-16 sm:w-20 md:w-24 text-center capitalize">
             {format(dataCompetencia, "MMM yyyy", { locale: ptBR })}
           </span>
-          <button onClick={next} className="p-0.5 text-muted-foreground hover:text-foreground transition-colors">
+          <button
+            onClick={next}
+            aria-label="Proximo mes"
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-background transition-colors"
+          >
             <ChevronRight size={14} />
           </button>
         </div>
